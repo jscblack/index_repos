@@ -66,6 +66,8 @@ void singlethreaded(char **argv) {
         printf("lookup,%ld,%f\n", n, (n * 1.0) / duration.count());
     }
 
+    printf("size,%ld\n", tree.size());
+
     {
         auto starttime = std::chrono::system_clock::now();
 
@@ -167,7 +169,7 @@ int main(int argc, char **argv) {
 
     singlethreaded(argv);
 
-    multithreaded(argv);
+    // multithreaded(argv);
 
     return 0;
 }

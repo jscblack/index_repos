@@ -104,4 +104,15 @@ namespace ART_unsynchronized {
             return std::get<0>(first) < std::get<0>(second);
         });
     }
+
+    long N4::size() {
+        long size = 0;
+        for(int i = 0; i < 4; i++) {
+            size += N::size(children[i]);
+            size += sizeof(children[i]);
+            size += sizeof(keys[i]);
+        }
+        size += sizeof(children);
+        return size;
+    }
 }

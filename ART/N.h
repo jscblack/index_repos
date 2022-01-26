@@ -107,6 +107,8 @@ namespace ART_unsynchronized {
 
         static void getChildren(const N *node, uint8_t start, uint8_t end, std::tuple<uint8_t, N *> children[],
                                 uint32_t &childrenCount);
+
+        static long size(N *node);
     };
 
     class N4 : public N {
@@ -139,6 +141,8 @@ namespace ART_unsynchronized {
 
         void getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
                          uint32_t &childrenCount) const;
+
+        long size();
     };
 
     class N16 : public N {
@@ -191,6 +195,8 @@ namespace ART_unsynchronized {
 
         void getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
                          uint32_t &childrenCount) const;
+
+        long size();
     };
 
     class N48 : public N {
@@ -222,6 +228,8 @@ namespace ART_unsynchronized {
 
         void getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
                          uint32_t &childrenCount) const;
+
+        long size();
     };
 
     class N256 : public N {
@@ -250,6 +258,8 @@ namespace ART_unsynchronized {
 
         void getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
                          uint32_t &childrenCount) const;
+
+        long size();
     };
 }
 #endif //ARTVERSION1_ARTVERSION_H

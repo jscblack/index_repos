@@ -73,6 +73,8 @@ namespace ART_unsynchronized {
         void insert(const Key &k, TID tid);
 
         void remove(const Key &k, TID tid);
+
+        long size();
     };
 }
 #endif //ARTVERSION1_SYNCHRONIZEDTREE_H

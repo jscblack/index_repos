@@ -69,4 +69,14 @@ namespace ART_unsynchronized {
             }
         }
     }
+
+    long N256::size() {
+        long size = 0;
+        for(int i = 0; i < 256; i++) {
+            size += N::size(children[i]);
+            size += sizeof(children[i]);
+        }
+        size += sizeof(children);
+        return size;
+    }
 }

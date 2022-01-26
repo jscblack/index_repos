@@ -506,4 +506,9 @@ namespace ART_unsynchronized {
         }
         return PCEqualsResults::BothMatch;
     }
+
+    long Tree::size() {
+        auto size = N::size(root);
+        return size + sizeof(root);
+    }
 }
