@@ -347,8 +347,11 @@ namespace ART_unsynchronized {
     }
 
     long N::size(N *node) {
-        if (N::isLeaf(node) || node == nullptr) {
+        if (node == nullptr) {
             return 0;
+        }
+        if (N::isLeaf(node)) {
+            return sizeof(N::getLeaf(node));
         }
         switch (node->getType()) {
             case NTypes::N4: {
