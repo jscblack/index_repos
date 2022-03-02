@@ -3,8 +3,8 @@
 #include <functional>
 #include "Tree.h"
 #include "N.cpp"
-#include "../Epoche.cpp"
 #include "../Key.h"
+#include "../Epoche.h"
 
 
 namespace ART_OLC {
@@ -333,7 +333,7 @@ namespace ART_OLC {
     }
 
     void Tree::insert(const Key &k, TID tid, ThreadInfo &epocheInfo) {
-        EpocheGuard epocheGuard(epocheInfo);
+        EpocheGuard EpocheGuard(epocheInfo);
         restart:
         bool needRestart = false;
 
@@ -384,6 +384,7 @@ namespace ART_OLC {
                                     node->getPrefixLength() - ((nextLevel - level) + 1));
 
                     node->writeUnlock();
+                    
                     return;
                 }
                 case CheckPrefixPessimisticResult::Match:
@@ -398,6 +399,7 @@ namespace ART_OLC {
             if (nextNode == nullptr) {
                 N::insertAndUnlock(node, v, parentNode, parentVersion, parentKey, nodeKey, N::setLeaf(tid), needRestart, epocheInfo);
                 if (needRestart) goto restart;
+                
                 return;
             }
 
@@ -424,11 +426,13 @@ namespace ART_OLC {
                 n4->insert(key[level + prefixLength], nextNode);
                 N::change(node, k[level - 1], n4);
                 node->writeUnlock();
+                
                 return;
             }
             level++;
             parentVersion = v;
         }
+        
     }
 
     void Tree::remove(const Key &k, TID tid, ThreadInfo &threadInfo) {

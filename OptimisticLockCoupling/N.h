@@ -30,7 +30,8 @@ namespace ART_OLC {
         N256 = 3
     };
 
-    static constexpr uint32_t maxStoredPrefixLength = 11;
+    static constexpr uint32_t
+    maxStoredPrefixLength = 11;
 
     using Prefix = uint8_t[maxStoredPrefixLength];
 
@@ -46,7 +47,7 @@ namespace ART_OLC {
         N(N &&) = delete;
 
         //2b type 60b version 1b lock 1b obsolete
-        std::atomic<uint64_t> typeVersionLockObsolete{0b100};
+        std::atomic <uint64_t> typeVersionLockObsolete{0b100};
         // version 1, unlocked, not obsolete
         uint32_t prefixCount = 0;
 
@@ -78,6 +79,7 @@ namespace ART_OLC {
          * returns true if node hasn't been changed in between
          */
         void checkOrRestart(uint64_t startRead, bool &needRestart) const;
+
         void readUnlockOrRestart(uint64_t startRead, bool &needRestart) const;
 
         static bool isObsolete(uint64_t version);
@@ -91,12 +93,16 @@ namespace ART_OLC {
 
         static N *getChild(const uint8_t k, const N *node);
 
-        static void insertAndUnlock(N *node, uint64_t v, N *parentNode, uint64_t parentVersion, uint8_t keyParent, uint8_t key, N *val, bool &needRestart,
-                                    ThreadInfo &threadInfo);
+        static void
+        insertAndUnlock(N *node, uint64_t v, N *parentNode, uint64_t parentVersion, uint8_t keyParent, uint8_t key,
+                        N *val, bool &needRestart,
+                        ThreadInfo &threadInfo);
 
         static bool change(N *node, uint8_t key, N *val);
 
-        static void removeAndUnlock(N *node, uint64_t v, uint8_t key, N *parentNode, uint64_t parentVersion, uint8_t keyParent, bool &needRestart, ThreadInfo &threadInfo);
+        static void
+        removeAndUnlock(N *node, uint64_t v, uint8_t key, N *parentNode, uint64_t parentVersion, uint8_t keyParent,
+                        bool &needRestart, ThreadInfo &threadInfo);
 
         bool hasPrefix() const;
 
@@ -125,13 +131,17 @@ namespace ART_OLC {
         static std::tuple<N *, uint8_t> getSecondChild(N *node, const uint8_t k);
 
         template<typename curN, typename biggerN>
-        static void insertGrow(curN *n, uint64_t v, N *parentNode, uint64_t parentVersion, uint8_t keyParent, uint8_t key, N *val, bool &needRestart, ThreadInfo &threadInfo);
+        static void
+        insertGrow(curN *n, uint64_t v, N *parentNode, uint64_t parentVersion, uint8_t keyParent, uint8_t key, N *val,
+                   bool &needRestart, ThreadInfo &threadInfo);
 
         template<typename curN, typename smallerN>
-        static void removeAndShrink(curN *n, uint64_t v, N *parentNode, uint64_t parentVersion, uint8_t keyParent, uint8_t key, bool &needRestart, ThreadInfo &threadInfo);
+        static void
+        removeAndShrink(curN *n, uint64_t v, N *parentNode, uint64_t parentVersion, uint8_t keyParent, uint8_t key,
+                        bool &needRestart, ThreadInfo &threadInfo);
 
         static uint64_t getChildren(const N *node, uint8_t start, uint8_t end, std::tuple<uint8_t, N *> children[],
-                                uint32_t &childrenCount);
+                                    uint32_t &childrenCount);
     };
 
     class N4 : public N {
@@ -141,7 +151,7 @@ namespace ART_OLC {
 
     public:
         N4(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N4, prefix,
-                                                                             prefixLength) { }
+                                                             prefixLength) {}
 
         void insert(uint8_t key, N *n);
 
@@ -165,7 +175,7 @@ namespace ART_OLC {
         void deleteChildren();
 
         uint64_t getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
-                         uint32_t &childrenCount) const;
+                             uint32_t &childrenCount) const;
     };
 
     class N16 : public N {
@@ -184,11 +194,20 @@ namespace ART_OLC {
             return __builtin_ctz(x);
 #else
             // Adapted from Hacker's Delight
-   unsigned n=1;
-   if ((x&0xFF)==0) {n+=8; x=x>>8;}
-   if ((x&0x0F)==0) {n+=4; x=x>>4;}
-   if ((x&0x03)==0) {n+=2; x=x>>2;}
-   return n-(x&1);
+            unsigned n = 1;
+            if ((x & 0xFF) == 0) {
+                n += 8;
+                x = x >> 8;
+            }
+            if ((x & 0x0F) == 0) {
+                n += 4;
+                x = x >> 4;
+            }
+            if ((x & 0x03) == 0) {
+                n += 2;
+                x = x >> 2;
+            }
+            return n - (x & 1);
 #endif
         }
 
@@ -196,7 +215,7 @@ namespace ART_OLC {
 
     public:
         N16(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N16, prefix,
-                                                                              prefixLength) {
+                                                              prefixLength) {
             memset(keys, 0, sizeof(keys));
             memset(children, 0, sizeof(children));
         }
@@ -221,7 +240,7 @@ namespace ART_OLC {
         void deleteChildren();
 
         uint64_t getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
-                         uint32_t &childrenCount) const;
+                             uint32_t &childrenCount) const;
     };
 
     class N48 : public N {
@@ -231,7 +250,7 @@ namespace ART_OLC {
         static const uint8_t emptyMarker = 48;
 
         N48(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N48, prefix,
-                                                                              prefixLength) {
+                                                              prefixLength) {
             memset(childIndex, emptyMarker, sizeof(childIndex));
             memset(children, 0, sizeof(children));
         }
@@ -256,7 +275,7 @@ namespace ART_OLC {
         void deleteChildren();
 
         uint64_t getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
-                         uint32_t &childrenCount) const;
+                             uint32_t &childrenCount) const;
     };
 
     class N256 : public N {
@@ -264,7 +283,7 @@ namespace ART_OLC {
 
     public:
         N256(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N256, prefix,
-                                                                               prefixLength) {
+                                                               prefixLength) {
             memset(children, '\0', sizeof(children));
         }
 
@@ -288,7 +307,9 @@ namespace ART_OLC {
         void deleteChildren();
 
         uint64_t getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
-                         uint32_t &childrenCount) const;
+                             uint32_t &childrenCount) const;
     };
 }
+
+
 #endif //ART_OPTIMISTIC_LOCK_COUPLING_N_H

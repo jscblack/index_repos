@@ -21,7 +21,7 @@ namespace ART_ROWEX {
 
         LoadKeyFunction loadKey;
 
-        Epoche epoche{256};
+        Epoche epoche{128};
 
     public:
         enum class CheckPrefixResult : uint8_t {
@@ -81,4 +81,6 @@ namespace ART_ROWEX {
         void remove(const Key &k, TID tid, ThreadInfo &epocheInfo);
     };
 }
+
+
 #endif //ART_ROWEX_TREE_H

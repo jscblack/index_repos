@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <algorithm>
 #include "N.h"
+#include "../Epoche.h"
 
 namespace ART_OLC {
 

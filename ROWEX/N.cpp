@@ -372,6 +372,10 @@ namespace ART_ROWEX {
 
     void N::deleteNode(N *node) {
         if (N::isLeaf(node)) {
+            void * leaf = reinterpret_cast<void *>(N::getLeaf(node));
+            if(leaf) {
+                delete leaf;
+            }
             return;
         }
         switch (node->getType()) {

@@ -6,6 +6,7 @@
 #define ART_OPTIMISTICLOCK_COUPLING_N_H
 #include "N.h"
 
+
 using namespace ART;
 
 namespace ART_OLC {
@@ -21,7 +22,7 @@ namespace ART_OLC {
 
         LoadKeyFunction loadKey;
 
-        Epoche epoche{256};
+        Epoche epoche{128};
 
     public:
         enum class CheckPrefixResult : uint8_t {
@@ -76,6 +77,9 @@ namespace ART_OLC {
         void insert(const Key &k, TID tid, ThreadInfo &epocheInfo);
 
         void remove(const Key &k, TID tid, ThreadInfo &epocheInfo);
+
+        void clear_stat();
     };
 }
+
 #endif //ART_OPTIMISTICLOCK_COUPLING_N_H

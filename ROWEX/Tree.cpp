@@ -3,7 +3,7 @@
 #include <functional>
 #include "Tree.h"
 #include "N.cpp"
-#include "../Epoche.cpp"
+#include "../Epoche.h"
 
 namespace ART_ROWEX {
 
@@ -262,8 +262,8 @@ namespace ART_ROWEX {
 
             uint8_t nonMatchingKey;
             Prefix remainingPrefix;
-            switch (checkPrefixPessimistic(node, k, nextLevel, nonMatchingKey, remainingPrefix,
-                                                           this->loadKey)) { // increases level
+            
+            switch (checkPrefixPessimistic(node, k, nextLevel, nonMatchingKey, remainingPrefix,this->loadKey)) { // increases level
                 case CheckPrefixPessimisticResult::SkippedLevel:
                     goto restart;
                 case CheckPrefixPessimisticResult::NoMatch: {
