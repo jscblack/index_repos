@@ -341,7 +341,46 @@ namespace ART_unsynchronized {
         }
     }
 
-    void Tree::remove(const Key &k, TID tid) {
+    bool Tree::update(const Key &k, TID tid) {
+        N *node = nullptr;
+        N *nextNode = root;
+        uint32_t level = 0;
+        bool optimisticPrefixMatch = false;
+
+        while (true) {
+            node = nextNode;
+            switch (checkPrefix(node, k, level)) { // increases level
+                case CheckPrefixResult::NoMatch:
+                    return false;
+                case CheckPrefixResult::OptimisticMatch:
+                    optimisticPrefixMatch = true;
+                    // fallthrough
+                case CheckPrefixResult::Match:
+                    if (k.getKeyLen() <= level) {
+                        return false;
+                    }
+                    nextNode = N::getChild(k[level], node);
+
+                    if (nextNode == nullptr) {
+                        return false;
+                    }
+                    if (N::isLeaf(nextNode)) {
+                        TID old_tid = N::getLeaf(nextNode);
+                        if (level < k.getKeyLen() - 1 || optimisticPrefixMatch) {
+                            if (checkKey(old_tid, k) == old_tid) {
+                                N::change(node, k[level], N::setLeaf(tid));
+                                return true;
+                            }
+                        }
+                        N::change(node, k[level], N::setLeaf(tid));
+                        return true;
+                    }
+                    level++;
+            }
+        }
+    }
+
+    void Tree::remove(const Key &k) {
         N *node = nullptr;
         N *nextNode = root;
         N *parentNode = nullptr;
@@ -367,9 +406,6 @@ namespace ART_unsynchronized {
                         return;
                     }
                     if (N::isLeaf(nextNode)) {
-                        if (N::getLeaf(nextNode) != tid) {
-                            return;
-                        }
                         assert(parentNode == nullptr || node->getCount() != 1);
                         if (node->getCount() == 2 && node != root) {
                             // 1. check remaining entries
@@ -381,13 +417,13 @@ namespace ART_unsynchronized {
                                 //N::remove(node, k[level]); not necessary
                                 N::change(parentNode, parentKey, secondNodeN);
 
-                                delete node;
+                                // delete node;
                             } else {
                                 //N::remove(node, k[level]); not necessary
                                 N::change(parentNode, parentKey, secondNodeN);
                                 secondNodeN->addPrefixBefore(node, secondNodeK);
 
-                                delete node;
+                                // delete node;
                             }
                         } else {
                             N::removeA(node, k[level], parentNode, parentKey);

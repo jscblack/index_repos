@@ -72,7 +72,9 @@ namespace ART_unsynchronized {
 
         void insert(const Key &k, TID tid);
 
-        void remove(const Key &k, TID tid);
+        bool update(const Key &k, TID tid);
+
+        void remove(const Key &k);
 
         long size();
     };

@@ -76,7 +76,9 @@ namespace ART_OLC {
 
         void insert(const Key &k, TID tid, ThreadInfo &epocheInfo);
 
-        void remove(const Key &k, TID tid, ThreadInfo &epocheInfo);
+        bool update(const Key &k, TID tid, ThreadInfo &threadEpocheInfo);
+
+        void remove(const Key &k, ThreadInfo &epocheInfo);
 
         void clear_stat();
     };

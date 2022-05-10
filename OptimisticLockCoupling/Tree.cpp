@@ -435,7 +435,77 @@ namespace ART_OLC {
         
     }
 
-    void Tree::remove(const Key &k, TID tid, ThreadInfo &threadInfo) {
+    bool Tree::update(const Key &k, TID tid, ThreadInfo &threadEpocheInfo) {
+        EpocheGuard epocheGuard(threadEpocheInfo);
+        restart:
+        bool needRestart = false;
+
+        N *node = nullptr;
+        N *nextNode = root;
+        N *parentNode = nullptr;
+        uint8_t parentKey, nodeKey = 0;
+        uint64_t parentVersion = 0;
+        uint32_t level = 0;
+        bool optimisticPrefixMatch = false;
+
+        while (true) {
+            parentNode = node;
+            parentKey = nodeKey;
+            node = nextNode;
+            auto v = node->readLockOrRestart(needRestart);
+            if (needRestart) goto restart;
+
+            switch (checkPrefix(node, k, level)) { // increases level
+                case CheckPrefixResult::NoMatch:
+                    node->readUnlockOrRestart(v, needRestart);
+                    if (needRestart) goto restart;
+                    return false;
+                case CheckPrefixResult::OptimisticMatch:
+                    // fallthrough
+                    optimisticPrefixMatch = true;
+                case CheckPrefixResult::Match: {
+                    nodeKey = k[level];
+                    nextNode = N::getChild(nodeKey, node);
+
+                    node->checkOrRestart(v, needRestart);
+                    if (needRestart) goto restart;
+
+                    if (nextNode == nullptr) {
+                        node->readUnlockOrRestart(v, needRestart);
+                        if (needRestart) goto restart;
+                        return false;
+                    }
+                    if (N::isLeaf(nextNode)) {
+                        if (k.getKeyLen() <= level) {
+                            return false;
+                        }
+
+                        parentNode->readUnlockOrRestart(parentVersion, needRestart);
+                        if (needRestart) goto restart;
+
+                        node->upgradeToWriteLockOrRestart(v, needRestart);
+                        if (needRestart) goto restart;
+
+                        TID old_tid = N::getLeaf(nextNode);
+                        if (level < k.getKeyLen() - 1 || optimisticPrefixMatch) {
+                            if (checkKey(old_tid, k) == old_tid) {
+                                N::change(node, k[level], N::setLeaf(tid));
+                                node->writeUnlock();
+                                return true;
+                            }
+                        }
+                        N::change(node, k[level], N::setLeaf(tid));
+                        node->writeUnlock();
+                        return true;
+                    }
+                    level++;
+                    parentVersion = v;
+                }
+            }
+        }
+    }
+
+    void Tree::remove(const Key &k, ThreadInfo &threadInfo) {
         EpocheGuard epocheGuard(threadInfo);
         restart:
         bool needRestart = false;
@@ -474,9 +544,6 @@ namespace ART_OLC {
                         return;
                     }
                     if (N::isLeaf(nextNode)) {
-                        if (N::getLeaf(nextNode) != tid) {
-                            return;
-                        }
                         assert(parentNode == nullptr || node->getCount() != 1);
                         if (node->getCount() == 2 && parentNode != nullptr) {
                             parentNode->upgradeToWriteLockOrRestart(parentVersion, needRestart);
