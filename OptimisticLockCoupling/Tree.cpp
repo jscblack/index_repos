@@ -480,8 +480,10 @@ namespace ART_OLC {
                             return false;
                         }
 
-                        parentNode->readUnlockOrRestart(parentVersion, needRestart);
-                        if (needRestart) goto restart;
+                        if(parentNode != nullptr) {
+                            parentNode->readUnlockOrRestart(parentVersion, needRestart);
+                            if (needRestart) goto restart;
+                        }
 
                         node->upgradeToWriteLockOrRestart(v, needRestart);
                         if (needRestart) goto restart;
