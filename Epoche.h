@@ -5,7 +5,6 @@
 
 #include <atomic>
 #include <array>
-#include <stat.h>
 #include <vector>
 #include "tbb/enumerable_thread_specific.h"
 #include "tbb/combinable.h"
