@@ -1748,6 +1748,14 @@ public:
         return m_stats;
     }
 
+    /// Return the memory comsumption of the B+ Tree
+    /// i.e. the total size of all nodes.
+    size_type get_memory_usage() const 
+    {
+        return m_stats.innernodes * sizeof(inner_node) +
+                m_stats.leaves * sizeof(leaf_node);
+    }
+
 public:
     // *** Standard Access Functions Querying the Tree by Descending to a Leaf
 
