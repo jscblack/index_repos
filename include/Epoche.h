@@ -4,6 +4,7 @@
 #define ART_EPOCHE_H
 
 #include <atomic>
+#include <cassert>
 #include <array>
 #include <vector>
 #include "tbb/enumerable_thread_specific.h"

@@ -9,8 +9,8 @@
 #include <stdint.h>
 #include <atomic>
 #include <string.h>
-#include "../Key.h"
-#include "../Epoche.h"
+#include "Key.h"
+#include "Epoche.h"
 #include <tbb/tbb.h>
 
 using namespace ART;
