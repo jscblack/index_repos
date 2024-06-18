@@ -1,6 +1,7 @@
 #ifndef UTIL_PAIR_H_
 #define UTIL_PAIR_H_
 
+#include <cstdint>
 #include <cstdlib>
 
 typedef uint64_t Key_t;
@@ -11,9 +12,9 @@ const Key_t INVALID = -1; // 11111...111
 
 const Value_t NONE = 0x0;
 
-struct Key {
+struct Dytis_Key {
   Key_t item;
-  Key(void)
+  Dytis_Key(void)
     : item{INVALID} { }
 };
 struct Value {

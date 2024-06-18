@@ -17,6 +17,8 @@ limitations under the License.
 #pragma once
 #include <stdio.h>
 #include <boost/pool/pool_alloc.hpp>
+#include "../util/util.h"
+#include "../util/pair.h"
 #define DO_NOTHING
 #define INITIAL_RANGE_BITS 1
 #define RANGE_BITS_LIMIT 17
@@ -99,17 +101,17 @@ struct Directory {
 #ifdef SEP
     if (seg_num <= pool_num) {
       void* addr = chunk_alloc[seg_num-1].malloc();
-      key_slot = new(static_cast<Key*>(addr)) \
-             Key[seg_num*kNumSlot];
-      void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+      key_slot = new(static_cast<Dytis_Key*>(addr)) \
+             Dytis_Key[seg_num*kNumSlot];
+      void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
       val_slot = new(static_cast<Value*>(val_addr))\
                  Value[seg_num*kNumSlot];
     }
     else {
-      void* addr = malloc(sizeof(Key)*seg_num*kNumSlot*2);
-      key_slot = new(static_cast<Key*>(addr)) \
-             Key[seg_num*kNumSlot];
-      void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+      void* addr = malloc(sizeof(Dytis_Key)*seg_num*kNumSlot*2);
+      key_slot = new(static_cast<Dytis_Key*>(addr)) \
+             Dytis_Key[seg_num*kNumSlot];
+      void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
       val_slot = new(static_cast<Value*>(val_addr))\
                  Value[seg_num*kNumSlot];
     }
@@ -133,17 +135,17 @@ struct Directory {
 #ifdef SEP
     if (seg_num <= pool_num) {
       void* addr = chunk_alloc[seg_num-1].malloc();
-      key_slot = new(static_cast<Key*>(addr)) \
-             Key[seg_num*kNumSlot];
-      void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+      key_slot = new(static_cast<Dytis_Key*>(addr)) \
+             Dytis_Key[seg_num*kNumSlot];
+      void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
       val_slot = new(static_cast<Value*>(val_addr))\
                  Value[seg_num*kNumSlot];
     }
     else {
-      void* addr = malloc(sizeof(Key)*seg_num*kNumSlot*2);
-      key_slot = new(static_cast<Key*>(addr)) \
-             Key[seg_num*kNumSlot];
-      void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+      void* addr = malloc(sizeof(Dytis_Key)*seg_num*kNumSlot*2);
+      key_slot = new(static_cast<Dytis_Key*>(addr)) \
+             Dytis_Key[seg_num*kNumSlot];
+      void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
       val_slot = new(static_cast<Value*>(val_addr))\
                  Value[seg_num*kNumSlot];
     }
@@ -167,17 +169,17 @@ struct Directory {
 #ifdef SEP
     if (seg_num <= pool_num) {
       void* addr = chunk_alloc[seg_num-1].malloc();
-      key_slot = new(static_cast<Key*>(addr)) \
-             Key[seg_num*kNumSlot];
-      void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+      key_slot = new(static_cast<Dytis_Key*>(addr)) \
+             Dytis_Key[seg_num*kNumSlot];
+      void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
       val_slot = new(static_cast<Value*>(val_addr))\
                  Value[seg_num*kNumSlot];
     }
     else {
-      void* addr = malloc(sizeof(Key)*seg_num*kNumSlot*2);
-      key_slot = new(static_cast<Key*>(addr)) \
-             Key[seg_num*kNumSlot];
-      void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+      void* addr = malloc(sizeof(Dytis_Key)*seg_num*kNumSlot*2);
+      key_slot = new(static_cast<Dytis_Key*>(addr)) \
+             Dytis_Key[seg_num*kNumSlot];
+      void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
       val_slot = new(static_cast<Value*>(val_addr))\
                  Value[seg_num*kNumSlot];
     }
@@ -229,7 +231,7 @@ struct Directory {
   inline Value_t* Find(Key_t&, size_t);
   inline bool Expand(int, int);
 #ifdef SEP
-  Key* key_slot;
+  Dytis_Key* key_slot;
   Value* val_slot;
   size_t seg_num;
 #else

@@ -22,10 +22,10 @@ limitations under the License.
 #include <mutex>
 #include <cmath>
 #include <stdlib.h>
-#include "util/util.h"
-#include "src/Directory.h"
-#include "src/ExtendibleHash.h"
-#include "util/pair.h"
+#include "../util/util.h"
+#include "../src/Directory.h"
+#include "../src/ExtendibleHash.h"
+#include "../util/pair.h"
 
 
 const size_t kCapacity = (1 << kDepth);

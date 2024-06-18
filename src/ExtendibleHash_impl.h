@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #pragma once
-#include "src/ExtendibleHash.h"
+#include "../src/ExtendibleHash.h"
 inline int ExtendibleHash::Insert(Key_t& key, Value_t value, short global_depth) {
 
 RETRY:

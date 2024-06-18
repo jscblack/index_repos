@@ -15,9 +15,9 @@ limitations under the License.
 */
 
 #pragma once
-#include "src/DyTIS.h"
-#include "src/Directory_impl.h"
-#include "src/ExtendibleHash_impl.h"
+#include "../src/DyTIS.h"
+#include "../src/Directory_impl.h"
+#include "../src/ExtendibleHash_impl.h"
 
 
 DyTIS::DyTIS(void)

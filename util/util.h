@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include "pair.h"
 #define REMAP_THRE 6
 #define BUC_THRE 0.6
 #define RECLAIM_THRE 0.6

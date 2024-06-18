@@ -15,7 +15,9 @@ limitations under the License.
 */
 
 #pragma once
-#include "src/Directory.h"
+#include "../src/Directory.h"
+#include <cstring>
+#include <math.h>
 
 inline Directory* Directory::LocalRemap(size_t key, int local_depth) {
   if (remap_available == -1) {
@@ -216,21 +218,21 @@ inline Directory* Directory::LocalRemap(size_t key, int local_depth) {
   } // End of while bucket need to split (remap)
   while (buc_num >= (block-buffer));
 #ifdef SEP
-  Key* temp_key_slot;
+  Dytis_Key* temp_key_slot;
   Value* temp_val_slot;
   if (snum <= pool_num) {
     void* addr = chunk_alloc[snum-1].malloc();
-    temp_key_slot = new(static_cast<Key*>(addr)) \
-           Key[snum*kNumSlot];
-    void* val_addr = addr + sizeof(Key) * snum * kNumSlot;
+    temp_key_slot = new(static_cast<Dytis_Key*>(addr)) \
+           Dytis_Key[snum*kNumSlot];
+    void* val_addr = addr + sizeof(Dytis_Key) * snum * kNumSlot;
     temp_val_slot = new(static_cast<Value*>(val_addr))\
                Value[snum*kNumSlot];
   }
   else {
-    void* addr = malloc(sizeof(Key) * snum * kNumSlot * 2);
-    temp_key_slot = new(static_cast<Key*>(addr)) \
-           Key[snum*kNumSlot];
-    void* val_addr = addr + sizeof(Key) * snum * kNumSlot;
+    void* addr = malloc(sizeof(Dytis_Key) * snum * kNumSlot * 2);
+    temp_key_slot = new(static_cast<Dytis_Key*>(addr)) \
+           Dytis_Key[snum*kNumSlot];
+    void* val_addr = addr + sizeof(Dytis_Key) * snum * kNumSlot;
     temp_val_slot = new(static_cast<Value*>(val_addr))\
                Value[snum*kNumSlot];
   }
@@ -341,7 +343,7 @@ inline int Directory::Insert(Key_t& key, Value_t value, size_t key_hash, size_t 
       }
 
       if (count != 0) {
-        memmove(key_slot+bucket+i+1, key_slot+bucket+i, sizeof(Key)*count);
+        memmove(key_slot+bucket+i+1, key_slot+bucket+i, sizeof(Dytis_Key)*count);
         memmove(val_slot+bucket+i+1, val_slot+bucket+i, sizeof(Value)*count);
 
       }
@@ -838,21 +840,21 @@ inline bool Directory::Expand(int local_depth, int rbits) {
   int prev_seg_num = seg_num;
   seg_num *= 2;
 #ifdef SEP
-  Key* temp_key_slot;
+  Dytis_Key* temp_key_slot;
   Value* temp_val_slot;
   if (seg_num <= pool_num) {
     void* addr = chunk_alloc[seg_num-1].malloc();
-    temp_key_slot = new(static_cast<Key*>(addr)) \
-           Key[seg_num*kNumSlot];
-    void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+    temp_key_slot = new(static_cast<Dytis_Key*>(addr)) \
+           Dytis_Key[seg_num*kNumSlot];
+    void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
     temp_val_slot = new(static_cast<Value*>(val_addr))\
                Value[seg_num*kNumSlot];
   }
   else {
-    void* addr = malloc(sizeof(Key)*seg_num*kNumSlot*2);
-    temp_key_slot = new(static_cast<Key*>(addr)) \
-           Key[seg_num*kNumSlot];
-    void* val_addr = addr + sizeof(Key) * seg_num * kNumSlot;
+    void* addr = malloc(sizeof(Dytis_Key)*seg_num*kNumSlot*2);
+    temp_key_slot = new(static_cast<Dytis_Key*>(addr)) \
+           Dytis_Key[seg_num*kNumSlot];
+    void* val_addr = addr + sizeof(Dytis_Key) * seg_num * kNumSlot;
     temp_val_slot = new(static_cast<Value*>(val_addr))\
                Value[seg_num*kNumSlot];
   }

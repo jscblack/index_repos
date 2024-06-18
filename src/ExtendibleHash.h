@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "Directory.h"
+#include <math.h>
 typedef struct ExtendibleHash ExtendibleHash;
 
 struct ExtendibleHash {
