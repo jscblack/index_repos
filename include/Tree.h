@@ -5,8 +5,7 @@
 #ifndef ARTVERSION1_TREE_H
 #define ARTVERSION1_TREE_H
 #include "N.h"
-
-using namespace ART;
+#include "Key.h"
 
 namespace ART_unsynchronized {
 

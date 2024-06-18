@@ -370,6 +370,10 @@ namespace ART_unsynchronized {
                 auto n = static_cast<N256 *>(node);
                 return n->size();
             }
+            default: {
+                assert(false);
+                __builtin_unreachable();
+            }
         }
     }
 }
