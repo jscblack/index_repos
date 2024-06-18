@@ -165,9 +165,8 @@ RETRY_D:
     DO_NOTHING;
   } else if (ret == -2) {
     goto RETRY_D;
-  } else {
-    return true;
-  }
+  } 
+  return true;
 }
 
 inline Value_t ExtendibleHash::Get(Key_t& key, short global_depth) {

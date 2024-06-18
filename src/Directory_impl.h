@@ -424,7 +424,7 @@ inline int Directory::Delete(Key_t& key, size_t key_hash, size_t y, bool islock,
     if (slot[bucket+i].key == INVALID)
       break;
     if (!shift && slot[bucket+i].key == key) {
-      slot[bucket+i].value = (i == 0) ? NULL : slot[bucket+i-1].value;
+      slot[bucket+i].value = (i == 0) ? 0 : slot[bucket+i-1].value;
       shift = true;
       num_key--;
     }
@@ -1151,7 +1151,7 @@ inline int Directory::tuning_local_cdf_by_range(int needed_bucket, int range, in
       new_seg_num += 1;
     return new_seg_num;
   }
-
+  return 0;
 }
 
 
