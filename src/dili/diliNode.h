@@ -535,28 +535,29 @@ struct diliNode{
     }
 
     void load(FILE *fp) {
-        fread(&meta_info, sizeof(int), 1, fp);
-        fread(&a, sizeof(double), 1, fp);
-        fread(&b, sizeof(double), 1, fp);
-        fread(&fanout, sizeof(int), 1, fp);
+        #define SUCC(x) if (!x) { assert(false); }
+        SUCC(fread(&meta_info, sizeof(int), 1, fp));
+        SUCC(fread(&a, sizeof(double), 1, fp));
+        SUCC(fread(&b, sizeof(double), 1, fp));
+        SUCC(fread(&fanout, sizeof(int), 1, fp));
         assert(fanout > 0);
 
-        fread(&num_nonempty, sizeof(int), 1, fp);
-        fread(&avg_n_travs_since_last_dist, sizeof(double), 1, fp);
-        fread(&total_n_travs, sizeof(long), 1, fp);
+        SUCC(fread(&num_nonempty, sizeof(int), 1, fp));
+        SUCC(fread(&avg_n_travs_since_last_dist, sizeof(double), 1, fp));
+        SUCC(fread(&total_n_travs, sizeof(long), 1, fp));
 
 
-        fread(&last_total_n_travs, sizeof(long), 1, fp);
-        fread(&last_nn, sizeof(int), 1, fp);
-        fread(&n_adjust, sizeof(int), 1, fp);
+        SUCC(fread(&last_total_n_travs, sizeof(long), 1, fp));
+        SUCC(fread(&last_nn, sizeof(int), 1, fp));
+        SUCC(fread(&n_adjust, sizeof(int), 1, fp));
 
         pe_data = new pairEntry[fanout];
         keyType key = 0;
         recordPtr ptr = 0;
         for (int i = 0; i < fanout; ++i) {
-            fread(&key, sizeof(keyType), 1, fp);
+            SUCC(fread(&key, sizeof(keyType), 1, fp));
             if (key >= 0) {
-                fread(&ptr, sizeof(recordPtr), 1, fp);
+                SUCC(fread(&ptr, sizeof(recordPtr), 1, fp));
                 pe_data[i].assign(key, ptr);
             } else if (key == -1){
                 diliNode *child = new diliNode(false);
@@ -570,6 +571,7 @@ struct diliNode{
                 pe_data[i].setNull();
             }
         }
+        #undef SUCC
     }
 
 

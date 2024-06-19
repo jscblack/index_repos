@@ -988,7 +988,7 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
 //        }
         cs.insert(lSib);
         if (cs.size() != (last_size + 1)) {
-            cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
+            // cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
         }
         assert(cs.size() == last_size + 1);
         last_size = cs.size();

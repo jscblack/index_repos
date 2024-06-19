@@ -28,10 +28,12 @@ struct fan2Leaf {
     }
 
     void load(FILE *fp) {
-        fread(&k1, sizeof(keyType),1, fp);
-        fread(&p1, sizeof(recordPtr),1, fp);
-        fread(&k2, sizeof(keyType),1, fp);
-        fread(&p2, sizeof(recordPtr),1, fp);
+        #define SUCC(x) if (!x) { assert(false); }
+        SUCC(fread(&k1, sizeof(keyType),1, fp));
+        SUCC(fread(&p1, sizeof(recordPtr),1, fp));
+        SUCC(fread(&k2, sizeof(keyType),1, fp));
+        SUCC(fread(&p2, sizeof(recordPtr),1, fp));
+        #undef SUCC
     }
 };
 

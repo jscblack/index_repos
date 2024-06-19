@@ -7,8 +7,8 @@
 #define DILI_INTERVAL_H
 
 struct interval{
-    static const keyType *data;
-    static const double *probs;
+    static keyType *data;
+    static double *probs;
 
     bool valid;
     int fanout;

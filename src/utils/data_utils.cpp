@@ -11,14 +11,14 @@
 using namespace std;
 
 namespace data_utils {
-    extern int32Array array_int32 = nullptr;
-    extern uint32Array array_uint32 = nullptr;
-    extern int64Array array_int64 = nullptr;
-    extern uint64Array array_uint64 = nullptr;
-    extern floatArray array_float = nullptr;
-    extern doubleArray array_double = nullptr;
-    extern keyArray array_key = nullptr;
-    extern recordPtrArray array_recordPtr = nullptr;
+    int32Array array_int32 = nullptr;
+    uint32Array array_uint32 = nullptr;
+    int64Array array_int64 = nullptr;
+    uint64Array array_uint64 = nullptr;
+    floatArray array_float = nullptr;
+    doubleArray array_double = nullptr;
+    keyArray array_key = nullptr;
+    recordPtrArray array_recordPtr = nullptr;
 
     long load_data_to_uptr(const char *data_path, DATA_FLAG flag) {
         FILE *fp = NULL;
