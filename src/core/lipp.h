@@ -292,6 +292,59 @@ public:
 
         printf("max_depth = %d, avg_depth = %.2lf\n", max_depth, double(sum_depth) / double(sum_nodes));
     }
+    void print_depth_stats(std::string str) const {
+        std::vector<size_t> depth_distribution;
+        std::stack<Node*> s;
+        std::stack<int> d;
+        s.push(root);
+        d.push(1);
+
+        int max_depth = 1;
+        size_t sum_depth = 0, sum_keys = 0;
+        while (!s.empty()) {
+            Node* node = s.top(); s.pop();
+            int depth = d.top(); d.pop();
+            for (int i = 0; i < node->num_items; i ++) {
+                if (BITMAP_GET(node->child_bitmap, i) == 1) {
+                    s.push(node->items[i].comp.child);
+                    d.push(depth + 1);
+                } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
+                    max_depth = std::max(max_depth, depth);
+                    sum_depth += depth;
+                    sum_keys ++;
+                    if (depth_distribution.size() <= depth) {
+                        depth_distribution.resize(depth + 1, 0);
+                    }
+                    depth_distribution[depth] ++;
+                }
+            }
+        }
+
+        double avg_depth = double(sum_depth) / double(sum_keys);
+        double variance = 0;
+        for (size_t i = 1; i < depth_distribution.size(); i ++) {
+            variance += depth_distribution[i] * (i - avg_depth) * (i - avg_depth);
+        }
+        variance /= sum_keys;
+
+        std::ofstream out_dist("lipp_" + str + "_depth_distribution.log");
+        std::ofstream out_stats("lipp_" + str + "_depth_stats.log");
+        if (!out_dist.is_open() || !out_stats.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_dist << "depth, count" << std::endl;
+        for (size_t i = 1; i < depth_distribution.size(); i ++) {
+            out_dist << i << ", " << depth_distribution[i] << std::endl;
+        }
+        out_stats << "sum_keys = " << sum_keys << std::endl;
+        out_stats << "max_depth = " << max_depth << std::endl;
+        out_stats << "avg_depth = " << avg_depth << std::endl;
+        out_stats << "variance = " << variance << std::endl;
+        out_stats << "standard = " << sqrt(variance) << std::endl;
+        out_dist.close();
+        out_stats.close();
+    }
     void verify() const {
         std::stack<Node*> s;
         s.push(root);
