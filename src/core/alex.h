@@ -2389,6 +2389,115 @@ class Alex {
   // Return a const reference to the current statistics
   const struct Stats& get_stats() const { return stats_; }
 
+  // Print depth distribution stats
+  void print_depth_stats(std::string s) const {
+    std::vector<size_t> depth_distribution;
+    size_t sum_depth = 0, sum_keys = 0;
+    int max_depth = 1;
+
+    std::stack<AlexNode<T, P>*> node_stack;
+    AlexNode<T, P>* cur;
+    node_stack.push(root_node_);
+
+    while (!node_stack.empty()) {
+      cur = node_stack.top();
+      node_stack.pop();
+
+      if (!cur->is_leaf_) { // inner node
+        auto node = static_cast<model_node_type*>(cur);
+        // push children
+        node_stack.push(node->children_[node->num_children_ - 1]);
+        for (int i = node->num_children_ - 2; i >= 0; i--) {
+          if (node->children_[i] != node->children_[i + 1]) {
+            node_stack.push(node->children_[i]);
+          }
+        }
+      } else {  // leaf node
+        auto node = static_cast<data_node_type*>(cur);
+        auto node_level = node->level_ + 1;   // level starts from 0 (root)
+        max_depth = std::max(max_depth, node_level);
+        sum_depth += node_level * node->num_keys_;
+        sum_keys += node->num_keys_;
+        if (depth_distribution.size() <= node_level) {
+          depth_distribution.resize(node_level + 1, 0);
+        }
+        depth_distribution[node_level] += node->num_keys_;
+      }
+    }
+
+    double avg_depth = double(sum_depth) / double(sum_keys);
+    double variance = 0;
+    for (size_t i = 1; i < depth_distribution.size(); i ++) {
+        variance += depth_distribution[i] * (i - avg_depth) * (i - avg_depth);
+    }
+    variance /= sum_keys;
+
+    std::ofstream out_dist("alex_" + s + "_depth_distribution.log");
+    std::ofstream out_stats("alex_" + s + "_depth_stats.log");
+    if (!out_dist.is_open() || !out_stats.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_dist << "depth, count" << std::endl;
+    for (size_t i = 1; i < depth_distribution.size(); i ++) {
+        out_dist << i << ", " << depth_distribution[i] << std::endl;
+    }
+    out_stats << "sum_keys = " << sum_keys << std::endl;
+    out_stats << "max_depth = " << max_depth << std::endl;
+    out_stats << "avg_depth = " << avg_depth << std::endl;
+    out_stats << "variance = " << variance << std::endl;
+    out_stats << "standard = " << sqrt(variance) << std::endl;
+    out_dist.close();
+    out_stats.close();
+  }
+
+  // Need to call this before backup searching
+  void reset_data_node_cmp_stats() {
+    auto cur_data_node = first_data_node();
+    while (cur_data_node != nullptr) {
+      cur_data_node->reset_stats();
+      cur_data_node = cur_data_node->next_leaf_;
+    }
+  }
+
+  void print_cmp_stats(std::string s) const {
+    std::vector<size_t> cmp_distribution;
+    double sum_cmp = 0, max_cmp = 0;
+    size_t sum_nodes = 0;
+
+    auto cur_data_node = first_data_node();
+    while (cur_data_node != nullptr) {
+      max_cmp = std::max(max_cmp, cur_data_node->exp_search_iterations_per_operation());
+      sum_cmp += cur_data_node->exp_search_iterations_per_operation();
+      sum_nodes ++;
+      size_t idx = static_cast<size_t>(cur_data_node->exp_search_iterations_per_operation());
+      if (cmp_distribution.size() <= idx) {
+        cmp_distribution.resize(idx + 1, 0);
+      }
+      cmp_distribution[idx] ++;
+
+      cur_data_node = cur_data_node->next_leaf_;
+    }
+
+    double avg_cmp = sum_cmp / sum_nodes;
+
+    std::ofstream out_dist("alex_" + s + "_cmp_distribution.log");
+    std::ofstream out_stats("alex_" + s + "_cmp_stats.log");
+    if (!out_dist.is_open() || !out_stats.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_dist << "cmp, count" << std::endl;
+    for (size_t i = 0; i < cmp_distribution.size(); i ++) {
+        out_dist << i << ", " << cmp_distribution[i] << std::endl;
+    }
+    out_stats << "sum_nodes = " << sum_nodes << std::endl;
+    out_stats << "max_cmp = " << max_cmp << std::endl;
+    out_stats << "avg_cmp = " << avg_cmp << std::endl;
+    out_dist.close();
+    out_stats.close();
+  }
+
   /*** Debugging ***/
 
  public:
