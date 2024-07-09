@@ -46,6 +46,8 @@
 #include <memory>
 #include <cstddef>
 #include <cassert>
+#include <vector>
+#include <queue>
 
 // *** Debugging Macros
 
@@ -1757,6 +1759,80 @@ public:
     }
 
 public:
+    // *** Statistics
+
+    void print_depth(std::string s) const
+    {
+        std::ofstream out_stats("btree_" + s + "_depth_stats.log");
+        out_stats << "depth = ";
+        if (m_root) {
+            out_stats << m_root->level + 1 << std::endl;
+        }
+        else {
+            out_stats << "0" << std::endl;
+        }
+    }
+
+    void print_load_factor_stats(std::string s) const {
+        std::vector<size_t> load_factor_distribution_inner; // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        std::vector<size_t> load_factor_distribution_leaf;  // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        load_factor_distribution_inner.resize(11, 0);
+        load_factor_distribution_leaf.resize(11, 0);
+
+        double sum_load_factor_inner = 0;
+        double sum_load_factor_leaf = 0;
+        double max_load_factor_inner = 0;
+        double max_load_factor_leaf = 0;
+        double load_factor = 0;
+
+        std::queue<node*> q;
+        q.push(m_root);
+        while (!q.empty()) {
+            node* n = q.front();
+            q.pop();
+
+            if (n->isleafnode()) {
+                load_factor = double(n->slotuse) / double(leafslotmax);
+                sum_load_factor_inner += load_factor;
+                max_load_factor_inner = std::max(max_load_factor_inner, load_factor);
+                load_factor_distribution_leaf[static_cast<int>(load_factor * 10)]++;
+            } else {
+                load_factor = double(n->slotuse) / double(innerslotmax);
+                sum_load_factor_leaf += load_factor;
+                max_load_factor_leaf = std::max(max_load_factor_leaf, load_factor);
+                load_factor_distribution_inner[static_cast<int>(load_factor * 10)]++;
+
+                inner_node* inner = static_cast<inner_node*>(n);
+                for (unsigned short slot = 0; slot <= inner->slotuse; ++slot) {
+                    q.push(inner->childid[slot]);
+                }
+            }
+        }
+
+        double avg_load_factor_inner = sum_load_factor_inner / m_stats.innernodes;
+        double avg_load_factor_leaf = sum_load_factor_leaf / m_stats.leaves;
+
+        std::ofstream out_dist("btree_" + s + "_load_factor_distribution.log");
+        std::ofstream out_stats("btree_" + s + "_load_factor_stats.log");
+        if (!out_dist.is_open() || !out_stats.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_dist << "load_factor, count" << std::endl;
+        for (size_t i = 0; i < load_factor_distribution_inner.size(); ++i) {
+            out_dist << double(i / 10.0) << ", " << load_factor_distribution_inner[i] << std::endl;
+        }
+        out_stats << "sum_inner_nodes = " << m_stats.innernodes << std::endl;
+        out_stats << "sum_leaf_nodes = " << m_stats.leaves << std::endl;
+        out_stats << "max_load_factor_inner = " << max_load_factor_inner << std::endl;
+        out_stats << "max_load_factor_leaf = " << max_load_factor_leaf << std::endl;
+        out_stats << "avg_load_factor_inner = " << avg_load_factor_inner << std::endl;
+        out_stats << "avg load_factor_leaf = " << avg_load_factor_leaf << std::endl;
+        out_dist.close();
+        out_stats.close();
+    }
+
+public:
     // *** Standard Access Functions Querying the Tree by Descending to a Leaf
 
     /// Non-STL function checking whether a key is in the B+ tree. The same as
@@ -2170,6 +2246,7 @@ private:
             newroot->slotuse = 1;
 
             m_root = newroot;
+            std::cout << "[INFO] Btree new root created, " << "curent depth = " << m_root->level + 1 << std::endl;
         }
 
         // increment itemcount if the item was inserted
