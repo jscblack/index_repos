@@ -577,7 +577,12 @@ namespace ART_unsynchronized {
             q.pop();
             d.pop();
 
+            if (cur_node == nullptr) {
+                continue;
+            }
+
             if (N::isLeaf(cur_node)) {
+                cur_depth--;
                 sum_keys++;
                 sum_depth += cur_depth;
                 max_depth = std::max(max_depth, cur_depth);
@@ -590,8 +595,18 @@ namespace ART_unsynchronized {
                     case NTypes::N4: {
                         type_distribution[static_cast<int>(NTypes::N4)]++;
                         auto n = static_cast<N4 *>(cur_node);
-                        for (uint8_t i = 0; i < n->getCount(); ++i) {
-                            q.push(n->get_child(i));
+                        // for (uint8_t i = 0; i < 4; ++i) {
+                        //     if (n->get_child(i) != nullptr) {
+                        //         q.push(n->get_child(i));
+                        //         d.push(cur_depth + 1);
+                        //     }
+                        // }
+                        uint8_t start = 0, end = 255;
+                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
+                        uint32_t childrenCount = 0;
+                        n->getChildren(start, end, children, childrenCount);
+                        for (uint32_t i = 0; i < childrenCount; ++i) {
+                            q.push(std::get<1>(children[i]));
                             d.push(cur_depth + 1);
                         }
                         break;
@@ -599,8 +614,18 @@ namespace ART_unsynchronized {
                     case NTypes::N16: {
                         type_distribution[static_cast<int>(NTypes::N16)]++;
                         auto n = static_cast<N16 *>(cur_node);
-                        for (uint8_t i = 0; i < n->getCount(); ++i) {
-                            q.push(n->get_child(i));
+                        // for (uint8_t i = 0; i < 16; ++i) {
+                        //     if (n->get_child(i) != nullptr) {
+                        //         q.push(n->get_child(i));
+                        //         d.push(cur_depth + 1);
+                        //     }
+                        // }
+                        uint8_t start = 0, end = 255;
+                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
+                        uint32_t childrenCount = 0;
+                        n->getChildren(start, end, children, childrenCount);
+                        for (uint32_t i = 0; i < childrenCount; ++i) {
+                            q.push(std::get<1>(children[i]));
                             d.push(cur_depth + 1);
                         }
                         break;
@@ -608,27 +633,43 @@ namespace ART_unsynchronized {
                     case NTypes::N48: {
                         type_distribution[static_cast<int>(NTypes::N48)]++;
                         auto n = static_cast<N48 *>(cur_node);
-                        for (uint8_t i = 0; i < 48; ++i) {
-                            if (n->get_child(i) != nullptr) {
-                                q.push(n->get_child(i));
-                                d.push(cur_depth + 1);
-                            }
+                        // for (uint8_t i = 0; i < 48; ++i) {
+                        //     if (n->get_child(i) != nullptr) {
+                        //         q.push(n->get_child(i));
+                        //         d.push(cur_depth + 1);
+                        //     }
+                        // }
+                        uint8_t start = 0, end = 255;
+                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
+                        uint32_t childrenCount = 0;
+                        n->getChildren(start, end, children, childrenCount);
+                        for (uint32_t i = 0; i < childrenCount; ++i) {
+                            q.push(std::get<1>(children[i]));
+                            d.push(cur_depth + 1);
                         }
                         break;
                     }
                     case NTypes::N256: {
                         type_distribution[static_cast<int>(NTypes::N256)]++;
                         auto n = static_cast<N256 *>(cur_node);
-                        for (uint8_t i = 0; i <= 255; ++i) {
-                            if (n->get_child(i) != nullptr) {
-                                q.push(n->get_child(i));
-                                d.push(cur_depth + 1);
-                            }
+                        // for (uint8_t i = 0; i <= 255; ++i) {
+                        //     if (n->get_child(i) != nullptr) {
+                        //         q.push(n->get_child(i));
+                        //         d.push(cur_depth + 1);
+                        //     }
+                        // }
+                        uint8_t start = 0, end = 255;
+                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
+                        uint32_t childrenCount = 0;
+                        n->getChildren(start, end, children, childrenCount);
+                        for (uint32_t i = 0; i < childrenCount; ++i) {
+                            q.push(std::get<1>(children[i]));
+                            d.push(cur_depth + 1);
                         }
                         break;
                     }
                     default: {
-                        __builtin_unreachable();
+                        break;
                     }
                 }
             }
@@ -672,4 +713,5 @@ namespace ART_unsynchronized {
         out_type << "N256," << type_distribution[3] << std::endl;
         out_type.close();
     }
+
 }
