@@ -1793,13 +1793,13 @@ public:
 
             if (n->isleafnode()) {
                 load_factor = double(n->slotuse) / double(leafslotmax);
-                sum_load_factor_inner += load_factor;
-                max_load_factor_inner = std::max(max_load_factor_inner, load_factor);
+                sum_load_factor_leaf += load_factor;
+                max_load_factor_leaf = std::max(max_load_factor_leaf, load_factor);
                 load_factor_distribution_leaf[static_cast<int>(load_factor * 10)]++;
             } else {
                 load_factor = double(n->slotuse) / double(innerslotmax);
-                sum_load_factor_leaf += load_factor;
-                max_load_factor_leaf = std::max(max_load_factor_leaf, load_factor);
+                sum_load_factor_inner += load_factor;
+                max_load_factor_inner = std::max(max_load_factor_inner, load_factor);
                 load_factor_distribution_inner[static_cast<int>(load_factor * 10)]++;
 
                 inner_node* inner = static_cast<inner_node*>(n);
@@ -1821,6 +1821,9 @@ public:
         out_dist << "load_factor, count" << std::endl;
         for (size_t i = 0; i < load_factor_distribution_inner.size(); ++i) {
             out_dist << double(i / 10.0) << ", " << load_factor_distribution_inner[i] << std::endl;
+        }
+        for (size_t i = 0; i < load_factor_distribution_leaf.size(); ++i) {
+            out_dist << double(i / 10.0) << ", " << load_factor_distribution_leaf[i] << std::endl;
         }
         out_stats << "sum_inner_nodes = " << m_stats.innernodes << std::endl;
         out_stats << "sum_leaf_nodes = " << m_stats.leaves << std::endl;
