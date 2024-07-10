@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
+#include <cmath>
 #include "Tree.h"
 #include "N.cpp"
 
@@ -552,15 +554,86 @@ namespace ART_unsynchronized {
         std::vector<size_t> type_distribution;
         type_distribution.resize(4, 0);
 
-        N::collect_stats(root, 1, depth_distribution, type_distribution);
+        // N::collect_stats(root, 1, depth_distribution, type_distribution);
 
-        // depth stats
-        size_t max_depth = depth_distribution.size() - 1;
+        // // depth stats
+        // size_t max_depth = depth_distribution.size() - 1;
+        // size_t sum_depth = 0, sum_keys = 0;
+        // for (size_t i = 1; i < depth_distribution.size(); i ++) {
+        //     sum_depth += i * depth_distribution[i];
+        //     sum_keys += depth_distribution[i];
+        // }
+
         size_t sum_depth = 0, sum_keys = 0;
-        for (size_t i = 1; i < depth_distribution.size(); i ++) {
-            sum_depth += i * depth_distribution[i];
-            sum_keys += depth_distribution[i];
+        size_t max_depth = 1;
+        std::queue<N*> q;
+        std::queue<size_t> d;
+        q.push(root);
+        d.push(1);
+
+        while (!q.empty()) {
+            N* cur_node = q.front();
+            size_t cur_depth = d.front();
+            q.pop();
+            d.pop();
+
+            if (N::isLeaf(cur_node)) {
+                sum_keys++;
+                sum_depth += cur_depth;
+                max_depth = std::max(max_depth, cur_depth);
+                if (depth_distribution.size() <= cur_depth) {
+                    depth_distribution.resize(cur_depth + 1, 0);
+                }
+                depth_distribution[cur_depth]++;
+            } else {
+                switch (cur_node->getType()) {
+                    case NTypes::N4: {
+                        type_distribution[static_cast<int>(NTypes::N4)]++;
+                        auto n = static_cast<N4 *>(cur_node);
+                        for (uint8_t i = 0; i < n->getCount(); ++i) {
+                            q.push(n->get_child(i));
+                            d.push(cur_depth + 1);
+                        }
+                        break;
+                    }
+                    case NTypes::N16: {
+                        type_distribution[static_cast<int>(NTypes::N16)]++;
+                        auto n = static_cast<N16 *>(cur_node);
+                        for (uint8_t i = 0; i < n->getCount(); ++i) {
+                            q.push(n->get_child(i));
+                            d.push(cur_depth + 1);
+                        }
+                        break;
+                    }
+                    case NTypes::N48: {
+                        type_distribution[static_cast<int>(NTypes::N48)]++;
+                        auto n = static_cast<N48 *>(cur_node);
+                        for (uint8_t i = 0; i < 48; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                            }
+                        }
+                        break;
+                    }
+                    case NTypes::N256: {
+                        type_distribution[static_cast<int>(NTypes::N256)]++;
+                        auto n = static_cast<N256 *>(cur_node);
+                        for (uint8_t i = 0; i <= 255; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                            }
+                        }
+                        break;
+                    }
+                    default: {
+                        __builtin_unreachable();
+                    }
+                }
+            }
         }
+
         double avg_depth = double(sum_depth) / double(sum_keys);
         double variance = 0;
         for (size_t i = 1; i < depth_distribution.size(); i ++) {
@@ -574,9 +647,9 @@ namespace ART_unsynchronized {
             std::cerr << "Failed to open file." << std::endl;
             return;
         }
-        out_dist << "depth, count" << std::endl;
+        out_dist << "depth,count" << std::endl;
         for (size_t i = 1; i < depth_distribution.size(); i ++) {
-            out_dist << i << ", " << depth_distribution[i] << std::endl;
+            out_dist << i << "," << depth_distribution[i] << std::endl;
         }
         out_stats << "sum_keys: " << sum_keys << std::endl;
         out_stats << "max_depth: " << max_depth << std::endl;
@@ -592,11 +665,11 @@ namespace ART_unsynchronized {
             std::cerr << "Failed to open file." << std::endl;
             return;
         }
-        out_type << "type, count" << std::endl;
-        out_type << "N4, " << type_distribution[0] << std::endl;
-        out_type << "N16, " << type_distribution[1] << std::endl;
-        out_type << "N48, " << type_distribution[2] << std::endl;
-        out_type << "N256, " << type_distribution[3] << std::endl;
+        out_type << "type,count" << std::endl;
+        out_type << "N4," << type_distribution[0] << std::endl;
+        out_type << "N16," << type_distribution[1] << std::endl;
+        out_type << "N48," << type_distribution[2] << std::endl;
+        out_type << "N256," << type_distribution[3] << std::endl;
         out_type.close();
     }
 }
