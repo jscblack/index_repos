@@ -404,6 +404,7 @@ namespace ART_unsynchronized {
                 // for (uint32_t i = 0; i < childrenCount; ++i) {
                 //     collect_stats(std::get<1>(children[i]), depth + 1, depth_distribution, type_distribution);
                 // }
+                break;
             }
             case NTypes::N16: {
                 type_distribution[static_cast<int>(NTypes::N16)]++;
@@ -418,6 +419,7 @@ namespace ART_unsynchronized {
                 // for (uint32_t i = 0; i < childrenCount; ++i) {
                 //     collect_stats(std::get<1>(children[i]), depth + 1, depth_distribution, type_distribution);
                 // }
+                break;
             }
             case NTypes::N48: {
                 type_distribution[static_cast<int>(NTypes::N48)]++;
@@ -432,6 +434,7 @@ namespace ART_unsynchronized {
                 // for (uint32_t i = 0; i < childrenCount; ++i) {
                 //     collect_stats(std::get<1>(children[i]), depth + 1, depth_distribution, type_distribution);
                 // }
+                break;
             }
             case NTypes::N256: {
                 type_distribution[static_cast<int>(NTypes::N256)]++;
@@ -446,6 +449,7 @@ namespace ART_unsynchronized {
                 // for (uint32_t i = 0; i < childrenCount; ++i) {
                 //     collect_stats(std::get<1>(children[i]), depth + 1, depth_distribution, type_distribution);
                 // }
+                break;
             }
             default: {
                 __builtin_unreachable();
