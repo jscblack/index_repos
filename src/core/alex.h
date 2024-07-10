@@ -2396,25 +2396,33 @@ class Alex {
     int max_depth = 1;
 
     std::stack<AlexNode<T, P>*> node_stack;
+    std::stack<int> d;
     AlexNode<T, P>* cur;
     node_stack.push(root_node_);
+    d.push(1);
 
     while (!node_stack.empty()) {
       cur = node_stack.top();
       node_stack.pop();
+      int depth = d.top();
+      d.pop();
 
       if (!cur->is_leaf_) { // inner node
         auto node = static_cast<model_node_type*>(cur);
         // push children
         node_stack.push(node->children_[node->num_children_ - 1]);
+        d.push(depth + 1);
         for (int i = node->num_children_ - 2; i >= 0; i--) {
           if (node->children_[i] != node->children_[i + 1]) {
             node_stack.push(node->children_[i]);
+            d.push(depth + 1);
           }
         }
       } else {  // leaf node
         auto node = static_cast<data_node_type*>(cur);
-        auto node_level = node->level_ + 1;   // level starts from 0 (root)
+        // auto node_level = node->level_ + 1;   // level starts from 0 (root)
+        // assert(node_level == depth);
+        auto node_level = depth;
         max_depth = std::max(max_depth, node_level);
         sum_depth += node_level * node->num_keys_;
         sum_keys += node->num_keys_;
