@@ -64,6 +64,10 @@ namespace ART_unsynchronized {
         }
     }
 
+    N *N16::get_child(uint8_t idx) const {
+        return children[idx];
+    }
+
     bool N16::remove(uint8_t k, bool force) {
         if (count == N16_shrink && !force) {
             return false;

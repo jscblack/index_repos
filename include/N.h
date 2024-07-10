@@ -104,6 +104,8 @@ namespace ART_unsynchronized {
                                 uint32_t &childrenCount);
 
         static long size(N *node);
+
+        static void collect_stats(N *node, size_t depth, std::vector<size_t> &depth_distribution, std::vector<size_t> &type_distribution);
     };
 
     class N4 : public N {
@@ -125,6 +127,8 @@ namespace ART_unsynchronized {
         void change(uint8_t key, N *val);
 
         N *getChild(const uint8_t k) const;
+
+        N *get_child(uint8_t idx) const;
 
         bool remove(uint8_t k, bool force);
 
@@ -182,6 +186,8 @@ namespace ART_unsynchronized {
 
         N *getChild(const uint8_t k) const;
 
+        N *get_child(uint8_t idx) const;
+
         bool remove(uint8_t k, bool force);
 
         N *getAnyChild() const;
@@ -215,6 +221,8 @@ namespace ART_unsynchronized {
 
         N *getChild(const uint8_t k) const;
 
+        N *get_child(uint8_t idx) const;
+
         bool remove(uint8_t k, bool force);
 
         N *getAnyChild() const;
@@ -233,7 +241,7 @@ namespace ART_unsynchronized {
     public:
         N256(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N256, prefix,
                                                                                prefixLength) {
-            memset(children, '\0', sizeof(children));
+            memset(children, 0, sizeof(children));
         }
 
         bool insert(uint8_t key, N *val);
@@ -244,6 +252,8 @@ namespace ART_unsynchronized {
         void change(uint8_t key, N *n);
 
         N *getChild(const uint8_t k) const;
+
+        N *get_child(uint8_t idx) const;
 
         bool remove(uint8_t k, bool force);
 

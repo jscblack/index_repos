@@ -54,6 +54,10 @@ namespace ART_unsynchronized {
         return nullptr;
     }
 
+    N *N4::get_child(uint8_t idx) const {
+        return children[idx];
+    }
+
     bool N4::remove(uint8_t k, bool /*force*/) {
         for (uint32_t i = 0; i < 4; ++i) {
             if (children[i] != nullptr && keys[i] == k) {
@@ -91,7 +95,7 @@ namespace ART_unsynchronized {
     }
 
     void N4::getChildren(uint8_t start, uint8_t end, std::tuple<uint8_t, N *> *&children,
-                         uint32_t &childrenCount) const {
+                         uint32_t &childrenCount) const{
 //TODO lock
         childrenCount = 0;
         for (uint32_t i = 0; i < 4; ++i) {

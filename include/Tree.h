@@ -76,6 +76,8 @@ namespace ART_unsynchronized {
         void remove(const Key &k);
 
         long size();
+
+        void print_depth_type_stats(std::string s);
     };
 }
 #endif //ARTVERSION1_SYNCHRONIZEDTREE_H

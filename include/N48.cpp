@@ -39,6 +39,10 @@ namespace ART_unsynchronized {
         }
     }
 
+    N *N48::get_child(uint8_t idx) const {
+        return children[idx];
+    }
+
     bool N48::remove(uint8_t k, bool force) {
         if (count == 12 && !force) {
             return false;

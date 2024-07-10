@@ -546,4 +546,57 @@ namespace ART_unsynchronized {
         auto size = N::size(root);
         return size + sizeof(root);
     }
+
+    void Tree::print_depth_type_stats(std::string s) {
+        std::vector<size_t> depth_distribution;
+        std::vector<size_t> type_distribution;
+        type_distribution.resize(4, 0);
+
+        N::collect_stats(root, 1, depth_distribution, type_distribution);
+
+        // depth stats
+        size_t max_depth = depth_distribution.size() - 1;
+        size_t sum_depth = 0, sum_keys = 0;
+        for (size_t i = 1; i < depth_distribution.size(); i ++) {
+            sum_depth += i * depth_distribution[i];
+            sum_keys += depth_distribution[i];
+        }
+        double avg_depth = double(sum_depth) / double(sum_keys);
+        double variance = 0;
+        for (size_t i = 1; i < depth_distribution.size(); i ++) {
+            variance += (i - avg_depth) * (i - avg_depth) * depth_distribution[i];
+        }
+        variance /= sum_keys;
+
+        std::ofstream out_dist("art_" + s + "_depth_distribution.log");
+        std::ofstream out_stats("art_" + s + "_depth_stats.log");
+        if (!out_dist.is_open() || !out_stats.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return;
+        }
+        out_dist << "depth, count" << std::endl;
+        for (size_t i = 1; i < depth_distribution.size(); i ++) {
+            out_dist << i << ", " << depth_distribution[i] << std::endl;
+        }
+        out_stats << "sum_keys: " << sum_keys << std::endl;
+        out_stats << "max_depth: " << max_depth << std::endl;
+        out_stats << "avg_depth: " << avg_depth << std::endl;
+        out_stats << "variance: " << variance << std::endl;
+        out_stats << "standard: " << sqrt(variance) << std::endl;
+        out_dist.close();
+        out_stats.close();
+
+        // type stats
+        std::ofstream out_type("art_" + s + "_type_distribution.log");
+        if (!out_type.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return;
+        }
+        out_type << "type, count" << std::endl;
+        out_type << "N4, " << type_distribution[0] << std::endl;
+        out_type << "N16, " << type_distribution[1] << std::endl;
+        out_type << "N48, " << type_distribution[2] << std::endl;
+        out_type << "N256, " << type_distribution[3] << std::endl;
+        out_type.close();
+    }
 }

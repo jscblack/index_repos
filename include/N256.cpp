@@ -36,6 +36,10 @@ namespace ART_unsynchronized {
         return children[k];
     }
 
+    N *N256::get_child(uint8_t idx) const {
+        return children[idx];
+    }
+
     bool N256::remove(uint8_t k, bool force) {
         if (count == 37 && !force) {
             return false;
