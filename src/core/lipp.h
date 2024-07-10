@@ -333,9 +333,9 @@ public:
             std::cerr << "Failed to open file." << std::endl;
             return ;
         }
-        out_dist << "depth, count" << std::endl;
+        out_dist << "depth,count" << std::endl;
         for (size_t i = 1; i < depth_distribution.size(); i ++) {
-            out_dist << i << ", " << depth_distribution[i] << std::endl;
+            out_dist << i << "," << depth_distribution[i] << std::endl;
         }
         out_stats << "sum_keys = " << sum_keys << std::endl;
         out_stats << "max_depth = " << max_depth << std::endl;
