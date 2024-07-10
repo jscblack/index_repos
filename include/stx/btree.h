@@ -43,6 +43,7 @@
 #include <functional>
 #include <istream>
 #include <ostream>
+#include <fstream>
 #include <memory>
 #include <cstddef>
 #include <cassert>
@@ -1818,12 +1819,12 @@ public:
             std::cerr << "Failed to open file." << std::endl;
             return ;
         }
-        out_dist << "load_factor, count" << std::endl;
+        out_dist << "load_factor,count" << std::endl;
         for (size_t i = 0; i < load_factor_distribution_inner.size(); ++i) {
-            out_dist << double(i / 10.0) << ", " << load_factor_distribution_inner[i] << std::endl;
+            out_dist << double(i / 10.0) << "," << load_factor_distribution_inner[i] << std::endl;
         }
         for (size_t i = 0; i < load_factor_distribution_leaf.size(); ++i) {
-            out_dist << double(i / 10.0) << ", " << load_factor_distribution_leaf[i] << std::endl;
+            out_dist << double(i / 10.0) << "," << load_factor_distribution_leaf[i] << std::endl;
         }
         out_stats << "sum_inner_nodes = " << m_stats.innernodes << std::endl;
         out_stats << "sum_leaf_nodes = " << m_stats.leaves << std::endl;
