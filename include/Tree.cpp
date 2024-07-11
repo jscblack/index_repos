@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <stack>
 #include "Tree.h"
 #include "N.cpp"
 
@@ -554,16 +555,6 @@ namespace ART_unsynchronized {
         std::vector<size_t> type_distribution;
         type_distribution.resize(4, 0);
 
-        // N::collect_stats(root, 1, depth_distribution, type_distribution);
-
-        // // depth stats
-        // size_t max_depth = depth_distribution.size() - 1;
-        // size_t sum_depth = 0, sum_keys = 0;
-        // for (size_t i = 1; i < depth_distribution.size(); i ++) {
-        //     sum_depth += i * depth_distribution[i];
-        //     sum_keys += depth_distribution[i];
-        // }
-
         size_t sum_depth = 0, sum_keys = 0;
         size_t max_depth = 1;
         std::queue<N*> q;
@@ -576,10 +567,6 @@ namespace ART_unsynchronized {
             size_t cur_depth = d.front();
             q.pop();
             d.pop();
-
-            if (cur_node == nullptr) {
-                continue;
-            }
 
             if (N::isLeaf(cur_node)) {
                 cur_depth--;
@@ -595,76 +582,44 @@ namespace ART_unsynchronized {
                     case NTypes::N4: {
                         type_distribution[static_cast<int>(NTypes::N4)]++;
                         auto n = static_cast<N4 *>(cur_node);
-                        // for (uint8_t i = 0; i < 4; ++i) {
-                        //     if (n->get_child(i) != nullptr) {
-                        //         q.push(n->get_child(i));
-                        //         d.push(cur_depth + 1);
-                        //     }
-                        // }
-                        uint8_t start = 0, end = 255;
-                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
-                        uint32_t childrenCount = 0;
-                        n->getChildren(start, end, children, childrenCount);
-                        for (uint32_t i = 0; i < childrenCount; ++i) {
-                            q.push(std::get<1>(children[i]));
-                            d.push(cur_depth + 1);
+                        for (uint8_t i = 0; i < 4; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                            }
                         }
                         break;
                     }
                     case NTypes::N16: {
                         type_distribution[static_cast<int>(NTypes::N16)]++;
                         auto n = static_cast<N16 *>(cur_node);
-                        // for (uint8_t i = 0; i < 16; ++i) {
-                        //     if (n->get_child(i) != nullptr) {
-                        //         q.push(n->get_child(i));
-                        //         d.push(cur_depth + 1);
-                        //     }
-                        // }
-                        uint8_t start = 0, end = 255;
-                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
-                        uint32_t childrenCount = 0;
-                        n->getChildren(start, end, children, childrenCount);
-                        for (uint32_t i = 0; i < childrenCount; ++i) {
-                            q.push(std::get<1>(children[i]));
-                            d.push(cur_depth + 1);
+                        for (uint8_t i = 0; i < 16; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                            }
                         }
                         break;
                     }
                     case NTypes::N48: {
                         type_distribution[static_cast<int>(NTypes::N48)]++;
                         auto n = static_cast<N48 *>(cur_node);
-                        // for (uint8_t i = 0; i < 48; ++i) {
-                        //     if (n->get_child(i) != nullptr) {
-                        //         q.push(n->get_child(i));
-                        //         d.push(cur_depth + 1);
-                        //     }
-                        // }
-                        uint8_t start = 0, end = 255;
-                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
-                        uint32_t childrenCount = 0;
-                        n->getChildren(start, end, children, childrenCount);
-                        for (uint32_t i = 0; i < childrenCount; ++i) {
-                            q.push(std::get<1>(children[i]));
-                            d.push(cur_depth + 1);
+                        for (uint8_t i = 0; i < 48; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                            }
                         }
                         break;
                     }
                     case NTypes::N256: {
                         type_distribution[static_cast<int>(NTypes::N256)]++;
                         auto n = static_cast<N256 *>(cur_node);
-                        // for (uint8_t i = 0; i <= 255; ++i) {
-                        //     if (n->get_child(i) != nullptr) {
-                        //         q.push(n->get_child(i));
-                        //         d.push(cur_depth + 1);
-                        //     }
-                        // }
-                        uint8_t start = 0, end = 255;
-                        std::tuple<uint8_t, N *> *children = new std::tuple<uint8_t, N *>[256];
-                        uint32_t childrenCount = 0;
-                        n->getChildren(start, end, children, childrenCount);
-                        for (uint32_t i = 0; i < childrenCount; ++i) {
-                            q.push(std::get<1>(children[i]));
-                            d.push(cur_depth + 1);
+                        for (uint16_t i = 0; i < 256; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                            }
                         }
                         break;
                     }
