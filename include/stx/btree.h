@@ -2250,7 +2250,9 @@ private:
             newroot->slotuse = 1;
 
             m_root = newroot;
+            #ifdef PROFILING
             std::cout << "[INFO] Btree new root created, " << "curent depth = " << m_root->level + 1 << std::endl;
+            #endif
         }
 
         // increment itemcount if the item was inserted
