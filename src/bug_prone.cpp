@@ -40,8 +40,12 @@ namespace database {
     }
 }
 
+// due to the slow bulkload, we only bulkload the 10M uniformly sampled from dataset
+// the rest 190M will be inserted one by one
+// no deletion in the test
+// and read for test
 #define DATA_SIZE 10000000l // 10M
-#define INSERT_SIZE 10000000l // 10M
+#define INSERT_SIZE 190000000l // 190M
 #define DELETE_SIZE 0l
 #define QUERY_SIZE 1000000l // 1M
 
@@ -55,7 +59,7 @@ vector<keyType> keys_to_delete;
 
 vector< pair<keyType, recordPtr> > bulk_load_data;
 
-const char* file_path = "/datasets/covid";
+const char* file_path = "/datasets/linear";
 void data_init() {
   std::random_device rd;
   std::mt19937 engine(rd());
@@ -69,17 +73,17 @@ void data_init() {
   uint64_t max_size;
   is.read(reinterpret_cast<char *>(&max_size), sizeof(uint64_t));
   auto _n = DATA_SIZE + INSERT_SIZE;
-  max_size = _n;
   uint64_t *data = new uint64_t[max_size];
   is.read(reinterpret_cast<char *>(data),
           std::streamsize(max_size * sizeof(uint64_t)));
-  shuffle(data, data + max_size, std::default_random_engine(seed));
+  std::shuffle(data, data + max_size, std::default_random_engine(seed));
   std::sort(data, data + DATA_SIZE); // bulk part is sorted
 
   // original load
   recordPtr last_ptr = -1;
   for (long i = 0; i < DATA_SIZE; ++i) {
     if (static_cast<keyType>(data[i]) != data[i]) {
+      // in case of overflow
       assert(false);
     }
     keyType key = data[i];
@@ -93,6 +97,9 @@ void data_init() {
     last_ptr = ptr;
     bulk_load_data.emplace_back(make_pair(key, ptr));
   }
+  std::cout << "bulkload first: " << bulk_load_data[0].first
+            << " bulkload last: "
+            << bulk_load_data[bulk_load_data.size() - 1].first << std::endl;
   for (long i = DATA_SIZE; i < DATA_SIZE + INSERT_SIZE; ++i) {
     if (static_cast<keyType>(data[i]) != data[i]) {
       assert(false);
