@@ -551,6 +551,13 @@ namespace ART_unsynchronized {
     }
 
     void Tree::print_depth_type_stats(std::string s) {
+        std::ofstream out_key_depth("art_" + s + "_key_depth_stats.log");
+        if (!out_key_depth.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_key_depth << "key,depth" << std::endl;
+
         std::vector<size_t> depth_distribution;
         std::vector<size_t> type_distribution;
         type_distribution.resize(4, 0);
@@ -577,6 +584,7 @@ namespace ART_unsynchronized {
                     depth_distribution.resize(cur_depth + 1, 0);
                 }
                 depth_distribution[cur_depth]++;
+                out_key_depth << N::getLeaf(cur_node) << "," << cur_depth << std::endl;
             } else {
                 switch (cur_node->getType()) {
                     case NTypes::N4: {
@@ -630,6 +638,8 @@ namespace ART_unsynchronized {
             }
         }
 
+        out_key_depth.close();
+
         double avg_depth = double(sum_depth) / double(sum_keys);
         double variance = 0;
         for (size_t i = 1; i < depth_distribution.size(); i ++) {
@@ -637,36 +647,36 @@ namespace ART_unsynchronized {
         }
         variance /= sum_keys;
 
-        std::ofstream out_dist("art_" + s + "_depth_distribution.log");
-        std::ofstream out_stats("art_" + s + "_depth_stats.log");
-        if (!out_dist.is_open() || !out_stats.is_open()) {
+        std::ofstream out_depth_dist("art_" + s + "_depth_distribution.log");
+        std::ofstream out_depth_stats("art_" + s + "_depth_stats.log");
+        if (!out_depth_dist.is_open() || !out_depth_stats.is_open()) {
             std::cerr << "Failed to open file." << std::endl;
             return;
         }
-        out_dist << "depth,count" << std::endl;
+        out_depth_dist << "depth,count" << std::endl;
         for (size_t i = 1; i < depth_distribution.size(); i ++) {
-            out_dist << i << "," << depth_distribution[i] << std::endl;
+            out_depth_dist << i << "," << depth_distribution[i] << std::endl;
         }
-        out_stats << "sum_keys: " << sum_keys << std::endl;
-        out_stats << "max_depth: " << max_depth << std::endl;
-        out_stats << "avg_depth: " << avg_depth << std::endl;
-        out_stats << "variance: " << variance << std::endl;
-        out_stats << "standard: " << sqrt(variance) << std::endl;
-        out_dist.close();
-        out_stats.close();
+        out_depth_stats << "sum_keys: " << sum_keys << std::endl;
+        out_depth_stats << "max_depth: " << max_depth << std::endl;
+        out_depth_stats << "avg_depth: " << avg_depth << std::endl;
+        out_depth_stats << "variance: " << variance << std::endl;
+        out_depth_stats << "standard: " << sqrt(variance) << std::endl;
+        out_depth_dist.close();
+        out_depth_stats.close();
 
         // type stats
-        std::ofstream out_type("art_" + s + "_type_distribution.log");
-        if (!out_type.is_open()) {
+        std::ofstream out_type_dist("art_" + s + "_type_distribution.log");
+        if (!out_type_dist.is_open()) {
             std::cerr << "Failed to open file." << std::endl;
             return;
         }
-        out_type << "type,count" << std::endl;
-        out_type << "N4," << type_distribution[0] << std::endl;
-        out_type << "N16," << type_distribution[1] << std::endl;
-        out_type << "N48," << type_distribution[2] << std::endl;
-        out_type << "N256," << type_distribution[3] << std::endl;
-        out_type.close();
+        out_type_dist << "type,count" << std::endl;
+        out_type_dist << "N4," << type_distribution[0] << std::endl;
+        out_type_dist << "N16," << type_distribution[1] << std::endl;
+        out_type_dist << "N48," << type_distribution[2] << std::endl;
+        out_type_dist << "N256," << type_distribution[3] << std::endl;
+        out_type_dist.close();
     }
 
     void Tree::verify_structure(std::string s) {
