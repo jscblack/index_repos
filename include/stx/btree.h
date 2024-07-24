@@ -1764,13 +1764,13 @@ public:
 
     void print_depth(std::string s) const
     {
-        std::ofstream out_stats("btree_" + s + "_depth_stats.log");
-        out_stats << "depth = ";
+        std::ofstream out_depth_stats("btree_" + s + "_depth_stats.log");
+        out_depth_stats << "depth = ";
         if (m_root) {
-            out_stats << m_root->level + 1 << std::endl;
+            out_depth_stats << m_root->level + 1 << std::endl;
         }
         else {
-            out_stats << "0" << std::endl;
+            out_depth_stats << "0" << std::endl;
         }
     }
 
@@ -2250,9 +2250,6 @@ private:
             newroot->slotuse = 1;
 
             m_root = newroot;
-            #ifdef PROFILING
-            std::cout << "[INFO] Btree new root created, " << "curent depth = " << m_root->level + 1 << std::endl;
-            #endif
         }
 
         // increment itemcount if the item was inserted
