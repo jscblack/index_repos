@@ -669,4 +669,84 @@ namespace ART_unsynchronized {
         out_type.close();
     }
 
+    void Tree::verify_structure(std::string s) {
+        std::ofstream out_file("art_" + s + "_structure.log");
+        std::queue<N*> q;
+        std::queue<size_t> d;
+        q.push(root);
+        d.push(1);
+
+        while (!q.empty()) {
+            N* cur_node = q.front();
+            size_t cur_depth = d.front();
+            q.pop();
+            d.pop();
+
+            if (N::isLeaf(cur_node)) {
+                cur_depth--;
+                TID tid = N::getLeaf(cur_node);
+                out_file << "Leaf,tid=" << tid << ",depth=" << cur_depth << std::endl;
+            } else {
+                switch (cur_node->getType()) {
+                    case NTypes::N4: {
+                        out_file << "N4,children=";
+                        auto n = static_cast<N4 *>(cur_node);
+                        for (uint8_t i = 0; i < 4; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                                out_file << i << ",";
+                            }
+                        }
+                        out_file << ",count=" << n->getCount() << std::endl;
+                        break;
+                    }
+                    case NTypes::N16: {
+                        out_file << "N16,children=";
+                        auto n = static_cast<N16 *>(cur_node);
+                        for (uint8_t i = 0; i < 16; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                                out_file << i << ",";
+                            }
+                        }
+                        out_file << ",count=" << n->getCount() << std::endl;
+                        break;
+                    }
+                    case NTypes::N48: {
+                        out_file << "N48,children=";
+                        auto n = static_cast<N48 *>(cur_node);
+                        for (uint8_t i = 0; i < 48; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                                out_file << i << ",";
+                            }
+                        }
+                        out_file << ",count=" << n->getCount() << std::endl;
+                        break;
+                    }
+                    case NTypes::N256: {
+                        out_file << "N256,children=";
+                        auto n = static_cast<N256 *>(cur_node);
+                        for (uint16_t i = 0; i < 256; ++i) {
+                            if (n->get_child(i) != nullptr) {
+                                q.push(n->get_child(i));
+                                d.push(cur_depth + 1);
+                                out_file << i << ",";
+                            }
+                        }
+                        out_file << ",count=" << n->getCount() << std::endl;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+        }
+
+        out_file.close();
+    }
 }

@@ -78,6 +78,8 @@ namespace ART_unsynchronized {
         long size();
 
         void print_depth_type_stats(std::string s);
+
+        void verify_structure(std::string s);
     };
 }
 #endif //ARTVERSION1_SYNCHRONIZEDTREE_H
