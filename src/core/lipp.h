@@ -293,7 +293,7 @@ public:
         printf("max_depth = %d, avg_depth = %.2lf\n", max_depth, double(sum_depth) / double(sum_nodes));
     }
     void print_depth_stats(std::string str) const {
-        std::ofstream out_key_depth("art_" + s + "_key_depth_stats.log");
+        std::ofstream out_key_depth("art_" + str + "_key_depth_stats.log");
         if (!out_key_depth.is_open()) {
             std::cerr << "Failed to open file." << std::endl;
             return ;
