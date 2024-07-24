@@ -2553,7 +2553,8 @@ class Alex {
       }
     }
 
-    // 遍历data node，记录每个data node的min key和对应全局的idx
+    // traverse all data nodes
+    // save the min key and its global index for each data node
     std::unordered_map<data_node_type*, std::pair<T, int>> data_node_map;
     data_node_type* cur_data_node = first_data_node();
     int idx = cur_data_node->find_lower(0);
@@ -2579,7 +2580,7 @@ class Alex {
     }
     out_file << "idx,key,slope,level" << std::endl;
 
-    // 第二次遍历，不在最大层的leaf node需要重复push进去，注意重复一次，深度加1
+    // print each level's model
     std::queue<AlexNode<T, P>*> node_queue;
     std::queue<int> depth_queue;
     node_queue.push(root_node_);
