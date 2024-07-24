@@ -727,6 +727,8 @@ class AlexDataNode : public AlexNode<T, P> {
     num_resizes_ = 0;
   }
 
+  long long get_num_exp_search_iterations() const { return num_exp_search_iterations_; }
+
   // Computes the expected cost of the current node
   double compute_expected_cost(double frac_inserts = 0) {
     if (num_keys_ == 0) {

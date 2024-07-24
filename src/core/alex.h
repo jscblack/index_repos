@@ -33,6 +33,8 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+#include <queue>
+#include <unordered_map>
 #include <type_traits>
 
 #include "alex_base.h"
@@ -985,6 +987,18 @@ class Alex {
     stats_.num_lookups++;
     data_node_type* leaf = get_leaf(key);
     int idx = leaf->find_key(key);
+    if (idx < 0) {
+      return nullptr;
+    } else {
+      return &(leaf->get_payload(idx));
+    }
+  }
+  P* get_payload(const T& key, long long& key_num_exp_search_iterations) const {
+    stats_.num_lookups++;
+    data_node_type* leaf = get_leaf(key);
+    auto last = leaf->get_num_exp_search_iterations();
+    int idx = leaf->find_key(key);
+    key_num_exp_search_iterations = leaf->get_num_exp_search_iterations() - last;
     if (idx < 0) {
       return nullptr;
     } else {
@@ -2468,42 +2482,152 @@ class Alex {
     }
   }
 
-  void print_cmp_stats(std::string s) const {
-    std::vector<size_t> cmp_distribution;
-    double sum_cmp = 0, max_cmp = 0;
-    size_t sum_nodes = 0;
-
-    auto cur_data_node = first_data_node();
-    while (cur_data_node != nullptr) {
-      max_cmp = std::max(max_cmp, cur_data_node->exp_search_iterations_per_operation());
-      sum_cmp += cur_data_node->exp_search_iterations_per_operation();
-      sum_nodes ++;
-      size_t idx = static_cast<size_t>(cur_data_node->exp_search_iterations_per_operation());
-      if (cmp_distribution.size() <= idx) {
-        cmp_distribution.resize(idx + 1, 0);
-      }
-      cmp_distribution[idx] ++;
-
-      cur_data_node = cur_data_node->next_leaf_;
-    }
-
-    double avg_cmp = sum_cmp / sum_nodes;
-
-    std::ofstream out_dist("alex_" + s + "_cmp_distribution.log");
-    std::ofstream out_stats("alex_" + s + "_cmp_stats.log");
-    if (!out_dist.is_open() || !out_stats.is_open()) {
+  void print_key_depth_stats(std::string s) const {
+    std::ofstream out_key_depth("alex_" + s + "_key_depth_stats.log");
+    if (!out_key_depth.is_open()) {
         std::cerr << "Failed to open file." << std::endl;
         return ;
     }
-    out_dist << "cmp,count" << std::endl;
-    for (size_t i = 0; i < cmp_distribution.size(); i ++) {
-        out_dist << i << "," << cmp_distribution[i] << std::endl;
+    out_key_depth << "key,depth" << std::endl;
+    data_node_type* cur_data_node = first_data_node();
+    int idx = cur_data_node->find_lower(0);
+    Iterator it(cur_data_node, idx);
+    while (!it.is_end()) {
+      out_key_depth << it.key() << "," << it.cur_leaf_->level_ + 1 << std::endl;
+      it++;
     }
-    out_stats << "sum_nodes = " << sum_nodes << std::endl;
-    out_stats << "max_cmp = " << max_cmp << std::endl;
-    out_stats << "avg_cmp = " << avg_cmp << std::endl;
-    out_dist.close();
-    out_stats.close();
+    out_key_depth.close();
+  }
+
+  void print_model_stats(std::string s) const {
+    std::ofstream out_file("alex_" + s + "_model_stats.log");
+    if (!out_file.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_file << "idx,key,slope" << std::endl;
+    data_node_type* cur_data_node = first_data_node();
+    int idx = cur_data_node->find_lower(0);
+    Iterator it(cur_data_node, idx);
+    int global_idx = 0;
+    while (!it.is_end()) {
+      out_file << global_idx << "," << it.key() << "," << it.cur_leaf_->model_.a_ << std::endl;
+      global_idx++;
+      it++;
+    }
+    out_file.close();
+  }
+
+  void print_level_model_stats(std::string s) const {
+    int max_depth = 1;
+    std::stack<AlexNode<T, P>*> node_stack;
+    std::stack<int> d;
+    AlexNode<T, P>* cur;
+
+    // find max depth
+    node_stack.push(root_node_);
+    d.push(1);
+    while (!node_stack.empty()) {
+      cur = node_stack.top();
+      node_stack.pop();
+      int depth = d.top();
+      d.pop();
+
+      if (!cur->is_leaf_) { // inner node
+        auto node = static_cast<model_node_type*>(cur);
+        // push children
+        node_stack.push(node->children_[node->num_children_ - 1]);
+        d.push(depth + 1);
+        for (int i = node->num_children_ - 2; i >= 0; i--) {
+          if (node->children_[i] != node->children_[i + 1]) {
+            node_stack.push(node->children_[i]);
+            d.push(depth + 1);
+          }
+        }
+      } else {  // leaf node
+        auto node = static_cast<data_node_type*>(cur);
+        // auto node_level = node->level_ + 1;   // level starts from 0 (root)
+        // assert(node_level == depth);
+        auto node_level = depth;
+        max_depth = std::max(max_depth, node_level);
+      }
+    }
+
+    // 遍历data node，记录每个data node的min key和对应全局的idx
+    std::unordered_map<data_node_type*, std::pair<T, int>> data_node_map;
+    data_node_type* cur_data_node = first_data_node();
+    int idx = cur_data_node->find_lower(0);
+    Iterator it(cur_data_node, idx);
+    data_node_type* prev_leaf = nullptr;
+    int prev_last_idx = 0;
+    int global_idx = 0;
+    while (!it.is_end()) {
+      if (it.cur_leaf_ != prev_leaf) {
+        data_node_map[it.cur_leaf_] = std::make_pair(it.key(), global_idx);
+        prev_leaf = it.cur_leaf_;
+        prev_last_idx = it.cur_idx_;
+      }
+      global_idx++;
+      it++;
+    }
+    data_node_map[prev_leaf] = std::make_pair(prev_leaf->key_slots_[prev_last_idx], global_idx - 1);  // global max key
+
+    std::ofstream out_file("alex_" + s + "_level_model_stats.log");
+    if (!out_file.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_file << "idx,key,slope,level" << std::endl;
+
+    // 第二次遍历，不在最大层的leaf node需要重复push进去，注意重复一次，深度加1
+    std::queue<AlexNode<T, P>*> node_queue;
+    std::queue<int> depth_queue;
+    node_queue.push(root_node_);
+    depth_queue.push(1);
+    while (!node_queue.empty()) {
+      cur = node_queue.front();
+      node_queue.pop();
+      int depth = depth_queue.front();
+      depth_queue.pop();
+
+      if (!cur->is_leaf_) { // inner node
+        auto node = static_cast<model_node_type*>(cur);
+        // print node model
+        auto n = cur;
+        while (!n->is_leaf_) {
+          n = static_cast<model_node_type*>(n)->children_[0];
+        }
+        auto data_n = static_cast<data_node_type*>(n);
+        out_file << data_node_map[data_n].second << "," << data_node_map[data_n].first << "," << node->model_.a_  << "," << depth << std::endl;
+        if (depth == depth_queue.front() - 1) { // for cur level's last inner node, print model upper bound
+          out_file << data_node_map[last_data_node()].second << "," << data_node_map[last_data_node()].first << "," << node->model_.a_  << "," << depth << std::endl;
+        }
+        // push children
+        // node_queue.push(node->children_[node->num_children_ - 1]);
+        node_queue.push(node->children_[0]);
+        depth_queue.push(depth + 1);
+        // for (int i = node->num_children_ - 2; i >= 0; i--) {
+        for (int i = 1; i <= node->num_children_ - 1; i++) {
+          if (node->children_[i] != node->children_[i - 1]) {
+            node_queue.push(node->children_[i]);
+            depth_queue.push(depth + 1);
+          }
+        }
+      } else {  // leaf node
+        auto node = static_cast<data_node_type*>(cur);
+        // print node model
+        out_file << data_node_map[node].second << "," << data_node_map[node].first << "," << node->model_.a_ << "," << depth << std::endl;
+        // auto node_level = node->level_ + 1;   // level starts from 0 (root)
+        // assert(node_level == depth);
+        auto node_level = depth;
+        if (node_level < max_depth) {
+          node_queue.push(node);
+          depth_queue.push(node_level + 1);
+        }
+      }
+    }
+    
+    out_file.close();
   }
 
   /*** Debugging ***/
