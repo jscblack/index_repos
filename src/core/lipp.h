@@ -293,6 +293,13 @@ public:
         printf("max_depth = %d, avg_depth = %.2lf\n", max_depth, double(sum_depth) / double(sum_nodes));
     }
     void print_depth_stats(std::string str) const {
+        std::ofstream out_key_depth("art_" + s + "_key_depth_stats.log");
+        if (!out_key_depth.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_key_depth << "key,depth" << std::endl;
+
         std::vector<size_t> depth_distribution;
         std::stack<Node*> s;
         std::stack<int> d;
@@ -316,9 +323,12 @@ public:
                         depth_distribution.resize(depth + 1, 0);
                     }
                     depth_distribution[depth] ++;
+                    out_key_depth << node->items[i].comp.data.key << "," << depth << std::endl;
                 }
             }
         }
+
+        out_key_depth.close();
 
         double avg_depth = double(sum_depth) / double(sum_keys);
         double variance = 0;
@@ -327,23 +337,56 @@ public:
         }
         variance /= sum_keys;
 
-        std::ofstream out_dist("lipp_" + str + "_depth_distribution.log");
-        std::ofstream out_stats("lipp_" + str + "_depth_stats.log");
-        if (!out_dist.is_open() || !out_stats.is_open()) {
+        std::ofstream out_depth_dist("lipp_" + str + "_depth_distribution.log");
+        std::ofstream out_depth_stats("lipp_" + str + "_depth_stats.log");
+        if (!out_depth_dist.is_open() || !out_depth_stats.is_open()) {
             std::cerr << "Failed to open file." << std::endl;
             return ;
         }
-        out_dist << "depth,count" << std::endl;
+        out_depth_dist << "depth,count" << std::endl;
         for (size_t i = 1; i < depth_distribution.size(); i ++) {
-            out_dist << i << "," << depth_distribution[i] << std::endl;
+            out_depth_dist << i << "," << depth_distribution[i] << std::endl;
         }
-        out_stats << "sum_keys = " << sum_keys << std::endl;
-        out_stats << "max_depth = " << max_depth << std::endl;
-        out_stats << "avg_depth = " << avg_depth << std::endl;
-        out_stats << "variance = " << variance << std::endl;
-        out_stats << "standard = " << sqrt(variance) << std::endl;
-        out_dist.close();
-        out_stats.close();
+        out_depth_stats << "sum_keys = " << sum_keys << std::endl;
+        out_depth_stats << "max_depth = " << max_depth << std::endl;
+        out_depth_stats << "avg_depth = " << avg_depth << std::endl;
+        out_depth_stats << "variance = " << variance << std::endl;
+        out_depth_stats << "standard = " << sqrt(variance) << std::endl;
+        out_depth_dist.close();
+        out_depth_stats.close();
+        return ;
+    }
+    void print_model_stats(std::string s) {
+        std::vector<std::tuple<size_t, T, double>> model_stats; // <idx, key, slope>
+        size_t key_idx = 0;
+        visit(root, model_stats, key_idx);
+
+        std::ofstream out_file("lipp_" + s + "_model_stats.log");
+        if (!out_file.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_file << "idx,key,slope" << std::endl;
+        for (auto tpl : model_stats) {
+            out_file << std::get<0>(tpl) << "," << std::get<1>(tpl) << "," << std::get<2>(tpl) << std::endl;
+        }
+        out_file.close();
+        return ;
+    }
+    void visit(Node* node, std::vector<std::tuple<size_t, T, double>>& model_stats, size_t& key_idx) {
+        for (int i = 0; i < node->num_items; i ++) {
+            if (BITMAP_GET(node->child_bitmap, i) == 1) {
+                visit(node->items[i].comp.child, model_stats, key_idx);
+            } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
+                if (i > 0 && BITMAP_GET(node->child_bitmap, i - 1) != 1 && BITMAP_GET(node->none_bitmap, i - 1) != 1) { // continuous data slot can merge
+                    key_idx ++;
+                } else {
+                    model_stats.push_back(std::make_tuple(key_idx, node->items[i].comp.data.key, node->model.a));
+                    key_idx ++;
+                }
+            }
+        }
+        return ;
     }
     void verify() const {
         std::stack<Node*> s;
