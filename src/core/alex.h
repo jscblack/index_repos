@@ -2405,6 +2405,13 @@ class Alex {
 
   // Print depth distribution stats
   void print_depth_stats(std::string s) const {
+    std::ofstream out_key_depth("alex_" + s + "_key_depth_stats.log");
+    if (!out_key_depth.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_key_depth << "key,depth" << std::endl;
+    
     std::vector<size_t> depth_distribution;
     size_t sum_depth = 0, sum_keys = 0;
     int max_depth = 1;
@@ -2444,8 +2451,17 @@ class Alex {
           depth_distribution.resize(node_level + 1, 0);
         }
         depth_distribution[node_level] += node->num_keys_;
+
+        int idx = node->find_lower(0);
+        Iterator it(node, idx);
+        while (it.cur_leaf_ == node) {
+          out_key_depth << it.key() << "," << node_level << std::endl;
+          it++;
+        }
       }
     }
+
+    out_key_depth.close();
 
     double avg_depth = double(sum_depth) / double(sum_keys);
     double variance = 0;
@@ -2471,32 +2487,6 @@ class Alex {
     out_stats << "standard = " << sqrt(variance) << std::endl;
     out_dist.close();
     out_stats.close();
-  }
-
-  // Need to call this before backup searching
-  void reset_data_node_cmp_stats() {
-    auto cur_data_node = first_data_node();
-    while (cur_data_node != nullptr) {
-      cur_data_node->reset_stats();
-      cur_data_node = cur_data_node->next_leaf_;
-    }
-  }
-
-  void print_key_depth_stats(std::string s) const {
-    std::ofstream out_key_depth("alex_" + s + "_key_depth_stats.log");
-    if (!out_key_depth.is_open()) {
-        std::cerr << "Failed to open file." << std::endl;
-        return ;
-    }
-    out_key_depth << "key,depth" << std::endl;
-    data_node_type* cur_data_node = first_data_node();
-    int idx = cur_data_node->find_lower(0);
-    Iterator it(cur_data_node, idx);
-    while (!it.is_end()) {
-      out_key_depth << it.key() << "," << it.cur_leaf_->level_ + 1 << std::endl;
-      it++;
-    }
-    out_key_depth.close();
   }
 
   void print_model_stats(std::string s) const {
