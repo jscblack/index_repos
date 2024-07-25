@@ -584,7 +584,10 @@ namespace ART_unsynchronized {
                     depth_distribution.resize(cur_depth + 1, 0);
                 }
                 depth_distribution[cur_depth]++;
-                out_key_depth << N::getLeaf(cur_node) << "," << cur_depth << std::endl;
+                auto ptr = reinterpret_cast<std::pair<uint64_t, uint64_t> *>(N::getLeaf(cur_node));
+                if (ptr) {
+                    out_key_depth << ptr->first << "," << cur_depth << std::endl;
+                }
             } else {
                 switch (cur_node->getType()) {
                     case NTypes::N4: {
@@ -695,7 +698,10 @@ namespace ART_unsynchronized {
             if (N::isLeaf(cur_node)) {
                 cur_depth--;
                 TID tid = N::getLeaf(cur_node);
-                out_file << "Leaf,tid=" << tid << ",depth=" << cur_depth << std::endl;
+                auto ptr = reinterpret_cast<std::pair<uint64_t, uint64_t> *>(tid);
+                if (ptr) {
+                    out_file << "Leaf,key=" << ptr->first << ",depth=" << cur_depth << std::endl;
+                }
             } else {
                 switch (cur_node->getType()) {
                     case NTypes::N4: {
