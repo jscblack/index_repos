@@ -7,6 +7,7 @@
 #include <limits>
 #include <cstdio>
 #include <stack>
+#include <queue>
 #include <vector>
 #include <cstring>
 #include <sstream>
@@ -356,12 +357,12 @@ public:
         out_depth_stats.close();
         return ;
     }
-    void print_model_stats(std::string s) {
+    void print_model_stats(std::string str) {
         std::vector<std::tuple<size_t, T, double>> model_stats; // <idx, key, slope>
         size_t key_idx = 0;
         visit(root, model_stats, key_idx);
 
-        std::ofstream out_file("lipp_" + s + "_model_stats.log");
+        std::ofstream out_file("lipp_" + str + "_model_stats.log");
         if (!out_file.is_open()) {
             std::cerr << "Failed to open file." << std::endl;
             return ;
@@ -387,6 +388,105 @@ public:
             }
         }
         return ;
+    }
+    void print_level_model_stats(std::string str) {
+        int max_depth = std::min(get_max_depth(), 10);
+
+        std::ofstream out_file("lipp_" + str + "_level_model_stats.log");
+        if (!out_file.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_file << "idx,key,slope,level" << std::endl;
+
+        std::queue<std::pair<Node*, int>> s;
+        std::queue<int> d;
+        s.push(std::make_pair(root, 0));
+        d.push(1);
+
+        while (!s.empty()) {
+            std::pair<Node*, int> p = s.front(); s.pop();
+            int depth = d.front(); d.pop();
+            Node* node = p.first; 
+            int sum_size = p.second;
+            bool have_child = false;
+            for (int i = 0; i < node->num_items; i ++) {
+                if (BITMAP_GET(node->child_bitmap, i) == 1) {
+                    have_child = true;
+                    s.push(std::make_pair(node->items[i].comp.child, sum_size));
+                    d.push(depth + 1);
+                    sum_size += node->items[i].comp.child->size;
+                } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
+                    sum_size ++;
+                }
+            }
+            if (depth < max_depth && !have_child) {
+                s.push(std::make_pair(node, p.second));
+                d.push(depth + 1);
+            }
+            T* keys = new T[node->size];
+            get_subtree_keys(node, keys);
+            out_file << p.second << "," << keys[0] << "," << node->model.a << "," << depth << std::endl;
+            delete []keys;
+            if (s.empty() || d.front() == depth + 1) {
+                keys = new T[root->size];
+                get_subtree_keys(root, keys);
+                out_file << root->size << "," << keys[root->size - 1] << "," << node->model.a << "," << depth << std::endl;
+                delete []keys;
+            }
+        }
+
+        out_file.close();
+    }
+    int get_max_depth() {
+        std::stack<Node*> s;
+        std::stack<int> d;
+        s.push(root);
+        d.push(1);
+
+        int max_depth = 1;
+        int sum_depth = 0, sum_nodes = 0;
+        while (!s.empty()) {
+            Node* node = s.top(); s.pop();
+            int depth = d.top(); d.pop();
+            for (int i = 0; i < node->num_items; i ++) {
+                if (BITMAP_GET(node->child_bitmap, i) == 1) {
+                    s.push(node->items[i].comp.child);
+                    d.push(depth + 1);
+                } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
+                    max_depth = std::max(max_depth, depth);
+                    sum_depth += depth;
+                    sum_nodes ++;
+                }
+            }
+        }
+
+        return max_depth;
+    }
+    void get_subtree_keys(Node* _root, T* keys) {
+        typedef std::pair<int, Node*> Segment; // <begin, Node*>
+        std::stack<Segment> s;
+
+        s.push(Segment(0, _root));
+        while (!s.empty()) {
+            int begin = s.top().first;
+            Node* node = s.top().second;
+            const int SHOULD_END_POS = begin + node->size;
+            s.pop();
+
+            for (int i = 0; i < node->num_items; i ++) {
+                if (BITMAP_GET(node->none_bitmap, i) == 0) {
+                    if (BITMAP_GET(node->child_bitmap, i) == 0) {
+                        keys[begin] = node->items[i].comp.data.key;
+                        begin ++;
+                    } else {
+                        s.push(Segment(begin, node->items[i].comp.child));
+                        begin += node->items[i].comp.child->size;
+                    }
+                }
+            }
+            RT_ASSERT(SHOULD_END_POS == begin);
+        }
     }
     void verify() const {
         std::stack<Node*> s;
