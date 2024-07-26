@@ -2512,6 +2512,81 @@ class Alex {
     out_file.close();
   }
 
+  void get_subtree_stats(AlexNode<T, P>* node, T& min_key, int& size) {
+    auto n = node;
+    while (!n->is_leaf_) {
+      n = static_cast<model_node_type*>(n)->children_[0];
+    }
+    auto min_leaf = static_cast<data_node_type*>(n);
+    n = node;
+    while (!n->is_leaf_) {
+      auto n_cast = static_cast<model_node_type*>(n);
+      n = n_cast->children_[n_cast->num_children_ - 1];
+    }
+    auto max_leaf = static_cast<data_node_type*>(n);
+    for (auto cur_leaf = min_leaf; cur_leaf != max_leaf; cur_leaf = cur_leaf->next_leaf_) {
+      size += cur_leaf->num_keys_;
+    }
+    size += max_leaf->num_keys_;
+    min_key = min_leaf->first_key();
+    return ;
+  }
+
+  void print_hist_model_stats(std::string s) {
+    std::ofstream out_file("alex_" + s + "_hist_model_stats.log");
+    if (!out_file.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_file << "key,hist,level" << std::endl;
+
+    if (root_node_ == nullptr) {
+      return ;
+    }
+
+    std::queue<AlexNode<T, P>*> node_queue;
+    std::queue<int> depth_queue;
+    AlexNode<T, P>* cur;
+    node_queue.push(root_node_);
+    depth_queue.push(1);
+    while (!node_queue.empty()) {
+      cur = node_queue.front();
+      node_queue.pop();
+      int depth = depth_queue.front();
+      depth_queue.pop();
+      if (!cur->is_leaf_) { // inner node
+        auto node = static_cast<model_node_type*>(cur);
+        // push children
+        node_queue.push(node->children_[0]);
+        depth_queue.push(depth + 1);
+        T min_key = 0;
+        int size = 0;
+        get_subtree_stats(node->children_[0], min_key, size);
+        out_file << min_key << "," << size << "," << depth << std::endl;
+        for (int i = 1; i <= node->num_children_ - 1; i++) {
+          if (node->children_[i] != node->children_[i - 1]) {
+            node_queue.push(node->children_[i]);
+            depth_queue.push(depth + 1);
+            size = 0;
+            get_subtree_stats(node->children_[i], min_key, size);
+            out_file << min_key << "," << size << "," << depth << std::endl;
+          }
+        }
+        if (node_queue.empty() || depth == depth_queue.front() - 1) { // cur level's last inner node
+          out_file << get_max_key() << "," << 0 << "," << depth << std::endl;
+        }
+      } else {  // leaf node
+        auto node = static_cast<data_node_type*>(cur);
+        out_file << node->first_key() << "," << node->num_keys_ << ","  << depth << std::endl;
+        if (node_queue.empty() || depth == depth_queue.front() - 1) { // cur level's last leaf node
+          out_file << get_max_key() << "," << 0 << "," << depth << std::endl;
+        }
+      }
+    }
+    
+    out_file.close();
+  }
+
   void print_level_model_stats(std::string s) const {
     std::ofstream out_file("alex_" + s + "_level_model_stats.log");
     if (!out_file.is_open()) {
