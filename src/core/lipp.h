@@ -301,6 +301,10 @@ public:
         }
         out_key_depth << "key,depth" << std::endl;
 
+        if (root == nullptr) {
+            return ;
+        }
+
         std::vector<size_t> depth_distribution;
         std::stack<Node*> s;
         std::stack<int> d;
@@ -390,14 +394,18 @@ public:
         return ;
     }
     void print_level_model_stats(std::string str) {
-        int max_depth = std::min(get_max_depth(), 10);
-
         std::ofstream out_file("lipp_" + str + "_level_model_stats.log");
         if (!out_file.is_open()) {
             std::cerr << "Failed to open file." << std::endl;
             return ;
         }
         out_file << "idx,key,slope,level" << std::endl;
+
+        if (root == nullptr) {
+            return ;
+        }
+
+        int max_depth = std::min(get_max_depth(), 10);
 
         std::queue<std::pair<Node*, int>> s;
         std::queue<int> d;
@@ -413,8 +421,10 @@ public:
             for (int i = 0; i < node->num_items; i ++) {
                 if (BITMAP_GET(node->child_bitmap, i) == 1) {
                     have_child = true;
-                    s.push(std::make_pair(node->items[i].comp.child, sum_size));
-                    d.push(depth + 1);
+                    if (depth < max_depth) {
+                        s.push(std::make_pair(node->items[i].comp.child, sum_size));
+                        d.push(depth + 1);
+                    }
                     sum_size += node->items[i].comp.child->size;
                 } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
                     sum_size ++;
@@ -431,7 +441,7 @@ public:
             if (s.empty() || d.front() == depth + 1) {
                 keys = new T[root->size];
                 get_subtree_keys(root, keys);
-                out_file << root->size << "," << keys[root->size - 1] << "," << node->model.a << "," << depth << std::endl;
+                out_file << root->size - 1 << "," << keys[root->size - 1] << "," << node->model.a << "," << depth << std::endl;
                 delete []keys;
             }
         }
