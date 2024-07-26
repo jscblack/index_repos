@@ -2411,6 +2411,10 @@ class Alex {
         return ;
     }
     out_key_depth << "key,depth" << std::endl;
+
+    if (root_node_ == nullptr) {
+      return ;
+    }
     
     std::vector<size_t> depth_distribution;
     size_t sum_depth = 0, sum_keys = 0;
@@ -2442,7 +2446,7 @@ class Alex {
       } else {  // leaf node
         auto node = static_cast<data_node_type*>(cur);
         // auto node_level = node->level_ + 1;   // level starts from 0 (root)
-        // assert(node_level == depth);
+        // assert(node_level == depth);          // bug here: assert may be false
         auto node_level = depth;
         max_depth = std::max(max_depth, node_level);
         sum_depth += node_level * node->num_keys_;
@@ -2509,12 +2513,22 @@ class Alex {
   }
 
   void print_level_model_stats(std::string s) const {
+    std::ofstream out_file("alex_" + s + "_level_model_stats.log");
+    if (!out_file.is_open()) {
+        std::cerr << "Failed to open file." << std::endl;
+        return ;
+    }
+    out_file << "idx,key,slope,level" << std::endl;
+
+    if (root_node_ == nullptr) {
+      return ;
+    }
+
+    // find max depth
     int max_depth = 1;
     std::stack<AlexNode<T, P>*> node_stack;
     std::stack<int> d;
     AlexNode<T, P>* cur;
-
-    // find max depth
     node_stack.push(root_node_);
     d.push(1);
     while (!node_stack.empty()) {
@@ -2522,7 +2536,6 @@ class Alex {
       node_stack.pop();
       int depth = d.top();
       d.pop();
-
       if (!cur->is_leaf_) { // inner node
         auto node = static_cast<model_node_type*>(cur);
         // push children
@@ -2536,12 +2549,10 @@ class Alex {
         }
       } else {  // leaf node
         auto node = static_cast<data_node_type*>(cur);
-        // auto node_level = node->level_ + 1;   // level starts from 0 (root)
-        // assert(node_level == depth);
-        auto node_level = depth;
-        max_depth = std::max(max_depth, node_level);
+        max_depth = std::max(max_depth, depth);
       }
     }
+    max_depth = std::min(max_depth, 10);
 
     // traverse all data nodes
     // save the min key and its global index for each data node
@@ -2561,13 +2572,6 @@ class Alex {
     }
     data_node_map[nullptr] = std::make_pair(get_max_key(), global_idx - 1);  // global max key
 
-    std::ofstream out_file("alex_" + s + "_level_model_stats.log");
-    if (!out_file.is_open()) {
-        std::cerr << "Failed to open file." << std::endl;
-        return ;
-    }
-    out_file << "idx,key,slope,level" << std::endl;
-
     // print each level's model
     std::queue<AlexNode<T, P>*> node_queue;
     std::queue<int> depth_queue;
@@ -2578,18 +2582,17 @@ class Alex {
       node_queue.pop();
       int depth = depth_queue.front();
       depth_queue.pop();
-
       if (!cur->is_leaf_) { // inner node
         auto node = static_cast<model_node_type*>(cur);
         // push children
-        // node_queue.push(node->children_[node->num_children_ - 1]);
-        node_queue.push(node->children_[0]);
-        depth_queue.push(depth + 1);
-        // for (int i = node->num_children_ - 2; i >= 0; i--) {
-        for (int i = 1; i <= node->num_children_ - 1; i++) {
-          if (node->children_[i] != node->children_[i - 1]) {
-            node_queue.push(node->children_[i]);
-            depth_queue.push(depth + 1);
+        if (depth < max_depth) {
+          node_queue.push(node->children_[0]);
+          depth_queue.push(depth + 1);
+          for (int i = 1; i <= node->num_children_ - 1; i++) {
+            if (node->children_[i] != node->children_[i - 1]) {
+              node_queue.push(node->children_[i]);
+              depth_queue.push(depth + 1);
+            }
           }
         }
         // print node model
@@ -2599,21 +2602,18 @@ class Alex {
         }
         auto data_n = static_cast<data_node_type*>(n);
         out_file << data_node_map[data_n].second << "," << data_node_map[data_n].first << "," << node->model_.a_  << "," << depth << std::endl;
-        if (depth == depth_queue.front() - 1) { // cur level's last inner node
+        if (node_queue.empty() || depth == depth_queue.front() - 1) { // cur level's last inner node
           out_file << data_node_map[nullptr].second << "," << data_node_map[nullptr].first << "," << node->model_.a_  << "," << depth << std::endl;
         }
       } else {  // leaf node
         auto node = static_cast<data_node_type*>(cur);
-        // auto node_level = node->level_ + 1;   // level starts from 0 (root)
-        // assert(node_level == depth);
-        auto node_level = depth;
-        if (node_level < max_depth) {
+        if (depth < max_depth) {
           node_queue.push(node);
-          depth_queue.push(node_level + 1);
+          depth_queue.push(depth + 1);
         }
         // print node model
         out_file << data_node_map[node].second << "," << data_node_map[node].first << "," << node->model_.a_ << "," << depth << std::endl;
-        if (node_queue.empty()) { // last leaf node
+        if (node_queue.empty() || depth == depth_queue.front() - 1) { // cur level's last leaf node
           out_file << data_node_map[nullptr].second << "," << data_node_map[nullptr].first << "," << node->model_.a_ << "," << depth << std::endl;
         }
       }
