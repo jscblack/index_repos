@@ -498,6 +498,50 @@ public:
             RT_ASSERT(SHOULD_END_POS == begin);
         }
     }
+    void print_hist_model_stats(std::string str) {
+        std::ofstream out_file("lipp_" + str + "_hist_model_stats.log");
+        if (!out_file.is_open()) {
+            std::cerr << "Failed to open file." << std::endl;
+            return ;
+        }
+        out_file << "key,hist,level" << std::endl;
+
+        if (root == nullptr) {
+            return ;
+        }
+
+        std::queue<Node*> s;
+        std::queue<int> d;
+        s.push(root);
+        d.push(1);
+
+        while (!s.empty()) {
+            Node* node = s.front(); s.pop();
+            int depth = d.front(); d.pop();
+            for (int i = 0; i < node->num_items; i ++) {
+                if (BITMAP_GET(node->child_bitmap, i) == 1) {
+                    s.push(node->items[i].comp.child);
+                    d.push(depth + 1);
+                    // print stats
+                    T* keys = new T[node->items[i].comp.child->size];
+                    get_subtree_keys(node->items[i].comp.child, keys);
+                    out_file << keys[0] << "," << node->items[i].comp.child->size << "," << depth << std::endl;
+                    delete []keys;
+                } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
+                    out_file << node->items[i].comp.data.key << "," << 1 << "," << depth << std::endl;
+                }
+            }
+            
+            if (s.empty() || d.front() == depth + 1) {
+                T* keys = new T[root->size];
+                get_subtree_keys(root, keys);
+                out_file << keys[root->size - 1] << "," << 0 << depth << std::endl;
+                delete []keys;
+            }
+        }
+
+        out_file.close();
+    }
     void verify() const {
         std::stack<Node*> s;
         s.push(root);
