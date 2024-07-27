@@ -2697,6 +2697,21 @@ class Alex {
     out_file.close();
   }
 
+  void print_smo_stats(std::string s) {
+    std::ofstream out("alex_" + s + "_smo_stats.log");
+    if (!out.is_open()) {
+      std::cerr << "Failed to open file." << std::endl;
+      return;
+    }
+    out << "smo,count" << std::endl;
+    out << "num_expand_and_scales" << "," << stats_.num_expand_and_scales << std::endl;
+    out << "num_expand_and_retrains" << "," << stats_.num_expand_and_retrains << std::endl;
+    out << "num_downward_splits" << "," << stats_.num_downward_splits << std::endl;
+    out << "num_sideways_splits" << "," << stats_.num_sideways_splits << std::endl;
+    out << "num_model_node_expansions" << "," << stats_.num_model_node_expansions << std::endl;
+    out << "num_model_node_splits" << "," << stats_.num_model_node_splits << std::endl;
+  }
+
   /*** Debugging ***/
 
  public:
