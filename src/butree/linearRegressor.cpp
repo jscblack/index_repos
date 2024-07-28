@@ -256,19 +256,19 @@ void linearRegressor::print_cal_ab(int fanout) {
         b = 0;
     }
 
-    printf("de_b = %.2lf, n_b = %.2lf, mean_x = %.2lf, mean_y = %.2lf, b = %.2lf\n", de_b, nu_b, mean_x, mean_y, b);
-    printf("mean_x * mean_x * fanout = %.2lf\n", mean_x * mean_x * fanout);
+    // printf("de_b = %.2lf, n_b = %.2lf, mean_x = %.2lf, mean_y = %.2lf, b = %.2lf\n", de_b, nu_b, mean_x, mean_y, b);
+    // printf("mean_x * mean_x * fanout = %.2lf\n", mean_x * mean_x * fanout);
 }
 
 void linearRegressor::print(long *data, int fanout) {
-    printf("a = %.2lf, b = %.2lf, sum_x = %.2lf, _de_b = %.2lf, _nu_b = %.2lf\n", a, b, sum_x, _de_b, _nu_b);
-//    cout << "a = " << a << ", b = " << b << ", sum_x = " << sum_x << ", _de_b = " << _de_b << ", _nu_b = " << _nu_b << endl;
+    // printf("a = %.2lf, b = %.2lf, sum_x = %.2lf, _de_b = %.2lf, _nu_b = %.2lf\n", a, b, sum_x, _de_b, _nu_b);
+//    // cout << "a = " << a << ", b = " << b << ", sum_x = " << sum_x << ", _de_b = " << _de_b << ", _nu_b = " << _nu_b << endl;
     if (data && fanout > 0) {
         print_cal_ab(fanout);
         for (int i = 0; i < fanout; ++i){
             long x = data[i];
             double pred = a + b * x;
-            cout << "x = " << x << ", pred = " << pred << endl;
+            // cout << "x = " << x << ", pred = " << pred << endl;
         }
     }
 }

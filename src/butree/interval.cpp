@@ -52,8 +52,8 @@ bool interval::check_lr_delta_x() {
 //            if (fanout > 0) {
                 bool status = data[lSib->start_idx] + lr->get_delta_x() == data[start_idx];
                 if (!status) {
-                    cout << "l_start_idx = " << lSib->start_idx << ", start_idx = " << start_idx << endl;
-                    cout << "l_data[0] = " << data[lSib->start_idx] << ", data[0] = " << data[start_idx] << ", delta_x = " << lr->get_delta_x() << endl;
+                    // cout << "l_start_idx = " << lSib->start_idx << ", start_idx = " << start_idx << endl;
+                    // cout << "l_data[0] = " << data[lSib->start_idx] << ", data[0] = " << data[start_idx] << ", delta_x = " << lr->get_delta_x() << endl;
                 }
                 return status;
 //            }

@@ -200,9 +200,9 @@ struct diliNode{
 
     inline recordPtr leaf_find(const keyType &key) const {
         int pred = LR_PRED(a, b, key, fanout);
-//        cout << "pred = " << pred << endl;
+//        // cout << "pred = " << pred << endl;
         pairEntry &pe = pe_data[pred];
-//        cout << "pe.key = " << pe.key << endl;
+//        // cout << "pe.key = " << pe.key << endl;
         if (pe.key == key) {
             return pe.ptr;
         }
@@ -528,7 +528,7 @@ struct diliNode{
         }
 
         if (fanout <= 0) {
-            cout << "!!!!error, fanout = " << fanout << ", meta_info = " << meta_info << endl;
+            // cout << "!!!!error, fanout = " << fanout << ", meta_info = " << meta_info << endl;
         }
         assert(fanout > 0);
 
@@ -598,7 +598,7 @@ struct diliNode{
 
     void trim() {
         if (fanout <= 0) {
-            cout << "****error, fanout = " << fanout << ", is_internal = " << is_internal() << endl;
+            // cout << "****error, fanout = " << fanout << ", is_internal = " << is_internal() << endl;
         }
         assert(fanout > 0);
         if (!is_internal() && num_nonempty == 0) {
@@ -607,7 +607,7 @@ struct diliNode{
         for (int i = 0; i < fanout; ++i) {
             pairEntry &pe = pe_data[i];
             if (!is_internal() && num_nonempty == 0) {
-                cout << "i = " << i << ", fan = " << fanout << ", pe.key = " << pe.key << endl;
+                // cout << "i = " << i << ", fan = " << fanout << ", pe.key = " << pe.key << endl;
             }
             if (pe.key == -1) {
                 diliNode *child = pe.child;
@@ -802,7 +802,7 @@ struct diliNode{
         int pred = LR_PRED(a, b, _key, fanout);
         pairEntry &pe = pe_data[pred];
 //    if (print) {
-//        cout << "_key = " << _key << ", pe.key = " << pe.key << ", fanout = " << fanout << ", pred = " << pred << ", num_nonempty = " << num_nonempty << endl;
+//        // cout << "_key = " << _key << ", pe.key = " << pe.key << ", fanout = " << fanout << ", pred = " << pred << ", num_nonempty = " << num_nonempty << endl;
 //    }
         if (pe.key < -2) {
             pe.assign(_key, _ptr);
@@ -1031,19 +1031,19 @@ struct diliNode{
             }
         }
         if (j != num_nonempty) {
-            cout << "j = " << j << ", num_nonempty = " << num_nonempty << ", is_internal = " << is_internal() << endl;
+            // cout << "j = " << j << ", num_nonempty = " << num_nonempty << ", is_internal = " << is_internal() << endl;
             for(int i = 0; i < num_nonempty; ++i) {
                 pairEntry &pe = pe_data[i];
                 if (pe.key >= 0) {
-                    cout << "i = " << i << ", pe.key = " << pe.key << endl;
+                    // cout << "i = " << i << ", pe.key = " << pe.key << endl;
                 } else if (pe.key == -1) {
                     diliNode *child = pe.child;
                     child->collect_all_keys(keys+j);
-                    cout << "i = " << i << ", child.num_nonempty = " << child->num_nonempty << endl;
+                    // cout << "i = " << i << ", child.num_nonempty = " << child->num_nonempty << endl;
                     j += child->num_nonempty;
                 } else if (pe.key == -2) {
                     fan2Leaf *fan2child = pe.fan2child;
-                    cout << "i = " << i << ", fan2child.num_nonempty = 2" << endl;
+                    // cout << "i = " << i << ", fan2child.num_nonempty = 2" << endl;
                     keys[j++] = fan2child->k1;
                     keys[j++] = fan2child->k2;
                 }

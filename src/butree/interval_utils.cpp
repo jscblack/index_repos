@@ -29,7 +29,7 @@ void check_intervals(interval *i_ptr) {
         i_ptr = i_ptr->rSib;
         ++count;
     }
-//    cout << "****count = " << count << endl;
+//    // cout << "****count = " << count << endl;
 }
 
 double cal_loss(long N, long n_intervals, double total_linear_loss, bool print=false) {
@@ -63,8 +63,8 @@ double cal_loss(long N, long n_intervals, double total_linear_loss, bool print=f
 
     double loss = ((2 + R1) * n_stages - 1) + s * (1 + R2) * avg_linear_loss;
     if (print) {
-        cout << "n_stages = " << n_stages << ", linear_loss = " << avg_linear_loss << ", xl_loss = "
-             << (1 + R2) * avg_linear_loss << ", other_loss = " << (2 + R1) * n_stages - 1 << ", s = " << s << endl;
+        // cout << "n_stages = " << n_stages << ", linear_loss = " << avg_linear_loss << ", xl_loss = "
+            //  << (1 + R2) * avg_linear_loss << ", other_loss = " << (2 + R1) * n_stages - 1 << ", s = " << s << endl;
     }
     return loss;
 }
@@ -99,7 +99,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     interval_set cs;
     long data_idx = 0;
 
-    cout << "step-1 starts." << endl;
+    // cout << "step-1 starts." << endl;
     auto start = chrono::system_clock::now();
     for (long i = 2; i < N; i += 2) {
         keyType x = X[i];
@@ -155,7 +155,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
         lSib->cal_merge_info(h);
         cs.insert(lSib);
         if (cs.size() != (last_size + 1)) {
-            cout << "cs.size() = " << cs.size() << endl;
+            // cout << "cs.size() = " << cs.size() << endl;
         }
         assert(cs.size() == last_size + 1);
         last_size = cs.size();
@@ -169,7 +169,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     auto stop = chrono::system_clock::now();
     auto duration = chrono::duration_cast<chrono::seconds>(stop - start);
     double response_time = static_cast<double>(duration.count());
-    cout << "step-1 takes " << response_time << " seconds." << endl;
+    // cout << "step-1 takes " << response_time << " seconds." << endl;
 //    border_set_check(cs);
 //    check_intervals(leftest_interval);
 
@@ -186,12 +186,12 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     long max_s_j = N / 32;
     long least_num_merge = s_j - max_s_j;
 
-//    cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
+//    // cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
 
     long n_merges = 0;
     last_size = cs.size();
 
-    cout << "step-2 starts." << endl;
+    // cout << "step-2 starts." << endl;
     start = chrono::system_clock::now();
     while (n_merges < least_num_merge) {
         bool merge_flag = true;
@@ -199,7 +199,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
         cs.erase(i_ptr);
 
 //        if (n_merges >= 4129) {
-//            cout << "******i_ptr->start_idx = " << i_ptr->start_idx << ", i_ptr->delta_x = " << i_ptr->lr->get_delta_x()
+//            // cout << "******i_ptr->start_idx = " << i_ptr->start_idx << ", i_ptr->delta_x = " << i_ptr->lr->get_delta_x()
 //                    << ", i_ptr->merge_lr->delta_x = " << static_cast<buInterval*>(i_ptr)->merge_lr->get_delta_x() << endl;
 //        }
 
@@ -232,7 +232,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
             ++n_merges;
 //            if (n_merges % 1000000 == 0) {
 ////            check_intervals(leftest_interval);
-//                cout << "step-3, n_merges = " << n_merges << endl;
+//                // cout << "step-3, n_merges = " << n_merges << endl;
 //            }
 
             assert(last_size == cs.size() + 1);
@@ -245,16 +245,16 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-2 takes " << response_time << " seconds." << endl;
+    // cout << "step-2 takes " << response_time << " seconds." << endl;
 //    check_intervals(leftest_interval);
 
 
-//    cout << "cs.size() = " << cs.size() << endl;
+//    // cout << "cs.size() = " << cs.size() << endl;
     interval *i_ptr = leftest_interval;
 
     double total_linear_loss = 0;
 
-    cout << "step-3 starts." << endl;
+    // cout << "step-3 starts." << endl;
     start = chrono::system_clock::now();
     long sum_fan = 0;
     while (i_ptr) {
@@ -269,10 +269,10 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-3 takes " << response_time << " seconds." << endl;
+    // cout << "step-3 takes " << response_time << " seconds." << endl;
 //    border_set.insert(X[N-1] + 1);
 
-//    cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
+//    // cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
 
     check_intervals(leftest_interval);
 
@@ -291,7 +291,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
         min_size = min_border_size;
     }
 
-    cout << "step-4 starts." << endl;
+    // cout << "step-4 starts." << endl;
     start = chrono::system_clock::now();
     while (border_set.size() > min_size) {
         interval *i_ptr = *(cs.begin());
@@ -355,7 +355,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
             }
 
 //            if (n_merges % 10000 == 0) {
-//                cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << ", loss = "
+//                // cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << ", loss = "
 //                     << curr_loss << ", best_loss = " << best_loss << endl;
 //            }
         } else {
@@ -366,7 +366,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-4 takes " << response_time << " seconds." << endl;
+    // cout << "step-4 takes " << response_time << " seconds." << endl;
 
 
     // complete_borders should not be sorted.
@@ -376,7 +376,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
     complete_losses.insert(complete_losses.end(), deleted_losses.rbegin(), deleted_losses.rend());
 
     border_set.insert(deleted_borders.begin() + best_idx, deleted_borders.end());
-//    cout << "best_border_set.size() = " << border_set.size() << ", best_idx = " << best_idx << endl;
+//    // cout << "best_border_set.size() = " << border_set.size() << ", best_idx = " << best_idx << endl;
 
 
     best_borders.insert(best_borders.end(), border_set.begin(), border_set.end());
@@ -385,7 +385,7 @@ double partition(const keyArray &X, const doubleArray &probs, long N, int h, lon
 //    int x = 5;
 //    while (!pmh.empty()) {
 //        dl_pair p = pmh.top();
-//        cout << "top-" << x << "-idx = " << p.second << endl;
+//        // cout << "top-" << x << "-idx = " << p.second << endl;
 //        pmh.pop();
 //        --x;
 //    }
@@ -426,7 +426,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
     interval_set cs;
     long data_idx = 0;
 
-    cout << "step-1 starts." << endl;
+    // cout << "step-1 starts." << endl;
     auto start = chrono::system_clock::now();
     for (long i = init_fan; i < N; i += init_fan) {
         keyType x = X[i];
@@ -455,7 +455,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
 
         cs.insert(lSib);
 //        if (cs.size() != (last_size + 1)) {
-//            cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
+//            // cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
 //        }
 //        assert(cs.size() == last_size + 1);
         last_size = cs.size();
@@ -466,7 +466,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
         }
     }
     if (s_j != cs.size() + 1) {
-        cout << "s_j = " << s_j << ", cs.size() = " << cs.size() << endl;
+        // cout << "s_j = " << s_j << ", cs.size() = " << cs.size() << endl;
     }
 
     assert (s_j == cs.size() + 1);
@@ -474,7 +474,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
     auto stop = chrono::system_clock::now();
     auto duration = chrono::duration_cast<chrono::seconds>(stop - start);
     double response_time = static_cast<double>(duration.count());
-    cout << "step-1 takes " << response_time << " seconds." << endl;
+    // cout << "step-1 takes " << response_time << " seconds." << endl;
 
 
     assert(s_j == cs.size() + 1);
@@ -482,12 +482,12 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
     long max_s_j = N / min_fanout;
     long least_num_merge = s_j - max_s_j;
 
-//    cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
+//    // cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
 
     long n_merges = 0;
     last_size = cs.size();
 
-    cout << "step-2 starts." << endl;
+    // cout << "step-2 starts." << endl;
     start = chrono::system_clock::now();
     while (n_merges < least_num_merge) {
         interval *i_ptr = *(cs.begin());
@@ -523,7 +523,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
             }
             ++n_merges;
 //            if (n_merges % 100000 == 0) {
-//                cout << "step-3, n_merges = " << n_merges << endl;
+//                // cout << "step-3, n_merges = " << n_merges << endl;
 //            }
 
             assert(last_size == cs.size() + 1);
@@ -536,16 +536,16 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-2 takes " << response_time << " seconds." << endl;
+    // cout << "step-2 takes " << response_time << " seconds." << endl;
 
-//    cout << "cs.size() = " << cs.size() << endl;
+//    // cout << "cs.size() = " << cs.size() << endl;
     if (max_s_j != cs.size() + 1) {
-        cout << "max_s_j = " << max_s_j << ", cs.size = " << cs.size() << endl;
+        // cout << "max_s_j = " << max_s_j << ", cs.size = " << cs.size() << endl;
     }
     assert(max_s_j == cs.size() + 1);
     interval *i_ptr = leftest_interval;
 
-    cout << "step-3 starts." << endl;
+    // cout << "step-3 starts." << endl;
     start = chrono::system_clock::now();
 
     long sum_fan = 0;
@@ -561,14 +561,14 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-3 takes " << response_time << " seconds." << endl;
+    // cout << "step-3 takes " << response_time << " seconds." << endl;
 
     if (max_s_j != border_set.size()) {
-        cout << "max_s_j = " << max_s_j << ", border_set.size = " << border_set.size() << endl;
+        // cout << "max_s_j = " << max_s_j << ", border_set.size = " << border_set.size() << endl;
     }
     assert(border_set.size() == max_s_j);
 //    border_set.insert(X[N-1] + 1);
-//    cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
+//    // cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
 
     check_intervals(leftest_interval);
 
@@ -580,7 +580,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
         min_size = 2;
     }
 
-    cout << "step-4 starts." << endl;
+    // cout << "step-4 starts." << endl;
     start = chrono::system_clock::now();
 
     doubleVec all_rmses;
@@ -623,7 +623,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
 
             ++n_merges;
 //            if (n_merges % 100000 == 0) {
-//                cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << endl;
+//                // cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << endl;
 //            }
         } else {
             cs.insert(original_rSib);
@@ -633,7 +633,7 @@ void get_complete_partition_borders_for_lowest_layer(const keyArray &X, long N, 
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-4 takes " << response_time << " seconds." << endl;
+    // cout << "step-4 takes " << response_time << " seconds." << endl;
 
     assert(min_size == border_set.size());
     assert(min_size + deleted_borders.size() == max_s_j);
@@ -685,7 +685,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
     interval_set cs;
     long data_idx = 0;
 
-    cout << "step-1 starts." << endl;
+    // cout << "step-1 starts." << endl;
     auto start = chrono::system_clock::now();
     for (long i = init_fan; i < N; i += init_fan) {
         keyType x = X[i];
@@ -714,7 +714,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
 
         cs.insert(lSib);
 //        if (cs.size() != (last_size + 1)) {
-//            cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
+//            // cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
 //        }
 //        assert(cs.size() == last_size + 1);
         last_size = cs.size();
@@ -725,7 +725,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
         }
     }
     if (s_j != cs.size() + 1) {
-        cout << "s_j = " << s_j << ", cs.size() = " << cs.size() << endl;
+        // cout << "s_j = " << s_j << ", cs.size() = " << cs.size() << endl;
     }
 
     assert (s_j == cs.size() + 1);
@@ -733,7 +733,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
     auto stop = chrono::system_clock::now();
     auto duration = chrono::duration_cast<chrono::seconds>(stop - start);
     double response_time = static_cast<double>(duration.count());
-    cout << "step-1 takes " << response_time << " seconds." << endl;
+    // cout << "step-1 takes " << response_time << " seconds." << endl;
 
 
     assert(s_j == cs.size() + 1);
@@ -741,12 +741,12 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
     long max_s_j = N / min_fanout;
     long least_num_merge = s_j - max_s_j;
 
-//    cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
+//    // cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
 
     long n_merges = 0;
     last_size = cs.size();
 
-    cout << "step-2 starts." << endl;
+    // cout << "step-2 starts." << endl;
     start = chrono::system_clock::now();
     while (n_merges < least_num_merge) {
         interval *i_ptr = *(cs.begin());
@@ -782,7 +782,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
             }
             ++n_merges;
 //            if (n_merges % 100000 == 0) {
-//                cout << "step-3, n_merges = " << n_merges << endl;
+//                // cout << "step-3, n_merges = " << n_merges << endl;
 //            }
 
             assert(last_size == cs.size() + 1);
@@ -795,16 +795,16 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-2 takes " << response_time << " seconds." << endl;
+    // cout << "step-2 takes " << response_time << " seconds." << endl;
 
-//    cout << "cs.size() = " << cs.size() << endl;
+//    // cout << "cs.size() = " << cs.size() << endl;
     if (max_s_j != cs.size() + 1) {
-        cout << "max_s_j = " << max_s_j << ", cs.size = " << cs.size() << endl;
+        // cout << "max_s_j = " << max_s_j << ", cs.size = " << cs.size() << endl;
     }
     assert(max_s_j == cs.size() + 1);
     interval *i_ptr = leftest_interval;
 
-    cout << "step-3 starts." << endl;
+    // cout << "step-3 starts." << endl;
     start = chrono::system_clock::now();
 
     long sum_fan = 0;
@@ -820,14 +820,14 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-3 takes " << response_time << " seconds." << endl;
+    // cout << "step-3 takes " << response_time << " seconds." << endl;
 
     if (max_s_j != border_set.size()) {
-        cout << "max_s_j = " << max_s_j << ", border_set.size = " << border_set.size() << endl;
+        // cout << "max_s_j = " << max_s_j << ", border_set.size = " << border_set.size() << endl;
     }
     assert(border_set.size() == max_s_j);
 //    border_set.insert(X[N-1] + 1);
-//    cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
+//    // cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
 
     check_intervals(leftest_interval);
 
@@ -839,7 +839,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
         min_size = 2;
     }
 
-    cout << "step-4 starts." << endl;
+    // cout << "step-4 starts." << endl;
     start = chrono::system_clock::now();
 
     doubleVec all_rmses;
@@ -882,7 +882,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
 
             ++n_merges;
 //            if (n_merges % 100000 == 0) {
-//                cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << endl;
+//                // cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << endl;
 //            }
         } else {
             cs.insert(original_rSib);
@@ -892,7 +892,7 @@ void get_complete_partition_borders_w_sampling(const keyArray &X, long N, int h,
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-4 takes " << response_time << " seconds." << endl;
+    // cout << "step-4 takes " << response_time << " seconds." << endl;
 
     assert(min_size == border_set.size());
     assert(min_size + deleted_borders.size() == max_s_j);
@@ -947,7 +947,7 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
     interval_set cs;
     long data_idx = 0;
 
-    cout << "step-1 starts." << endl;
+    // cout << "step-1 starts." << endl;
     auto start = chrono::system_clock::now();
     for (long i = 2; i < N; i += 2) {
         keyType x = X[i];
@@ -984,11 +984,11 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
 //        auto it = cs.find(lSib);
 //        if (it != cs.end()) {
 //            interval *tmp = *it;
-//            cout << "i = " << i << ", tmp.merge_metric = " << tmp->merge_metric << ", tmp.lbd = " << tmp->lbd << ", lSib.merge_metric = " << lSib->merge_metric << ", lSib.lbd = " << lSib->lbd << endl;
+//            // cout << "i = " << i << ", tmp.merge_metric = " << tmp->merge_metric << ", tmp.lbd = " << tmp->lbd << ", lSib.merge_metric = " << lSib->merge_metric << ", lSib.lbd = " << lSib->lbd << endl;
 //        }
         cs.insert(lSib);
         if (cs.size() != (last_size + 1)) {
-            // cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
+            // // cout << "cs.size() = " << cs.size() << ", last_size = " << last_size << endl;
         }
         assert(cs.size() == last_size + 1);
         last_size = cs.size();
@@ -999,13 +999,13 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
         }
     }
     if (s_j != cs.size() + 1) {
-        cout << "s_j = " << s_j << ", cs.size() = " << cs.size() << endl;
+        // cout << "s_j = " << s_j << ", cs.size() = " << cs.size() << endl;
     }
 
     auto stop = chrono::system_clock::now();
     auto duration = chrono::duration_cast<chrono::seconds>(stop - start);
     double response_time = static_cast<double>(duration.count());
-    cout << "step-1 takes " << response_time << " seconds." << endl;
+    // cout << "step-1 takes " << response_time << " seconds." << endl;
 
 
     assert(s_j == cs.size() + 1);
@@ -1013,12 +1013,12 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
     long max_s_j = N / min_fanout;
     long least_num_merge = s_j - max_s_j;
 
-//    cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
+//    // cout << "step-2 finished. s_j = " << s_j << ", least_num_merge = " << least_num_merge << ", cs.size() = " << cs.size() << endl;
 
     long n_merges = 0;
     last_size = cs.size();
 
-    cout << "step-2 starts." << endl;
+    // cout << "step-2 starts." << endl;
     start = chrono::system_clock::now();
     while (n_merges < least_num_merge) {
         interval *i_ptr = *(cs.begin());
@@ -1054,7 +1054,7 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
             }
             ++n_merges;
 //            if (n_merges % 100000 == 0) {
-//                cout << "step-3, n_merges = " << n_merges << endl;
+//                // cout << "step-3, n_merges = " << n_merges << endl;
 //            }
 
             assert(last_size == cs.size() + 1);
@@ -1067,16 +1067,16 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-2 takes " << response_time << " seconds." << endl;
+    // cout << "step-2 takes " << response_time << " seconds." << endl;
 
-//    cout << "cs.size() = " << cs.size() << endl;
+//    // cout << "cs.size() = " << cs.size() << endl;
     if (max_s_j != cs.size() + 1) {
-        cout << "max_s_j = " << max_s_j << ", cs.size = " << cs.size() << endl;
+        // cout << "max_s_j = " << max_s_j << ", cs.size = " << cs.size() << endl;
     }
     assert(max_s_j == cs.size() + 1);
     interval *i_ptr = leftest_interval;
 
-    cout << "step-3 starts." << endl;
+    // cout << "step-3 starts." << endl;
     start = chrono::system_clock::now();
 
     long sum_fan = 0;
@@ -1092,14 +1092,14 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-3 takes " << response_time << " seconds." << endl;
+    // cout << "step-3 takes " << response_time << " seconds." << endl;
 
     if (max_s_j != border_set.size()) {
-        cout << "max_s_j = " << max_s_j << ", border_set.size = " << border_set.size() << endl;
+        // cout << "max_s_j = " << max_s_j << ", border_set.size = " << border_set.size() << endl;
     }
     assert(border_set.size() == max_s_j);
 //    border_set.insert(X[N-1] + 1);
-//    cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
+//    // cout << "step-4 finished. border_set.size = " << border_set.size() << ", sum_fan = " << sum_fan << endl;
 
     check_intervals(leftest_interval);
 
@@ -1111,7 +1111,7 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
         min_size = 2;
     }
 
-    cout << "step-4 starts." << endl;
+    // cout << "step-4 starts." << endl;
     start = chrono::system_clock::now();
 
     doubleVec all_rmses;
@@ -1154,7 +1154,7 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
 
             ++n_merges;
 //            if (n_merges % 100000 == 0) {
-//                cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << endl;
+//                // cout << "step-5, n_merges = " << n_merges << ", n_intervals = " << border_set.size() - 1 << endl;
 //            }
         } else {
             cs.insert(original_rSib);
@@ -1164,7 +1164,7 @@ void get_complete_partition_borders(const keyArray &X, const doubleArray &probs,
     stop = chrono::system_clock::now();
     duration = chrono::duration_cast<chrono::seconds>(stop - start);
     response_time = static_cast<double>(duration.count());
-    cout << "step-4 takes " << response_time << " seconds." << endl;
+    // cout << "step-4 takes " << response_time << " seconds." << endl;
 
     assert(min_size == border_set.size());
     assert(min_size + deleted_borders.size() == max_s_j);
@@ -1207,7 +1207,7 @@ void build_mirror(const keyArray &X, const doubleArray &probs, long N, l_matrix 
         data_utils::save_vec_data(h0_path.c_str(), mirror[0]);
     }
     curr_n_nodes = mirror[mirror.size() - 1].size();
-    cout << "leaf nodes have been created" << endl;
+    // cout << "leaf nodes have been created" << endl;
 
 
     int height = mirror.size();
@@ -1221,7 +1221,7 @@ void build_mirror(const keyArray &X, const doubleArray &probs, long N, l_matrix 
         std::copy(highest_bounds.begin(), highest_bounds.end(), topX.get());
         topX[curr_n_nodes] = X[N-1] + 1;
 
-        cout << "stage-" <<  (height+1) << " from bottom. curr_n_nodes = " << curr_n_nodes << endl;
+        // cout << "stage-" <<  (height+1) << " from bottom. curr_n_nodes = " << curr_n_nodes << endl;
         if (height > 1 && curr_n_nodes <= 200001) {
             mirror.push_back(root_info);
             assert(mirror.size() == height + 1);
@@ -1238,14 +1238,14 @@ void build_mirror(const keyArray &X, const doubleArray &probs, long N, l_matrix 
         root_loss = (root_loss > 1) ? log(root_loss) / log(2.0) : 0;
 //        root_loss = 1 + ((root_loss > 1) ? (2 * log(root_loss) / log(2.0)) : 0);
 //        root_loss *= (1 + R2);
-        cout << "root_loss = " << root_loss << endl;
+        // cout << "root_loss = " << root_loss << endl;
 
         mirror.push_back(longVec());
         longVec hi_borders;
         doubleVec hi_losses;
         double int_loss = partition(topX, nullptr, curr_n_nodes, height, mirror[mirror.size()-1], -1, hi_borders, hi_losses, interval_type);
 
-        cout << "int_loss = " << int_loss << endl;
+        // cout << "int_loss = " << int_loss << endl;
         // check if one more stage needs to be added.
         ++height;
         if (height > 2 && root_loss < int_loss) {
@@ -1293,7 +1293,7 @@ void build_mirror_from_given_layout(const keyArray &X, const doubleArray &probs,
         long n_nodes = layout[0];
         long h0_min_size = h0_borders.back();
         h0_borders.pop_back();
-        cout << "h0_borsers.size() = " << h0_borders.size() << endl;
+        // cout << "h0_borsers.size() = " << h0_borders.size() << endl;
 
         mirror.push_back(longVec());
 
@@ -1305,7 +1305,7 @@ void build_mirror_from_given_layout(const keyArray &X, const doubleArray &probs,
 //        data_utils::save_vec_data(h0_path.c_str(), mirror[0]);
     }
     int curr_n_nodes = mirror[mirror.size() - 1].size();
-    cout << "leaf nodes have been created. n_nodes = " << curr_n_nodes << ", mirror.size = " << mirror.size() << endl;
+    // cout << "leaf nodes have been created. n_nodes = " << curr_n_nodes << ", mirror.size = " << mirror.size() << endl;
 
     int H = layout.size();
     for (int i = 1; i < H - 1; ++i) {
@@ -1324,7 +1324,7 @@ void build_mirror_from_given_layout(const keyArray &X, const doubleArray &probs,
         long hi_min_size = hi_borders.back();
         hi_borders.pop_back();
         mirror.push_back(longVec());
-        cout << "hi_borsers.size() = " << hi_borders.size() << endl;
+        // cout << "hi_borsers.size() = " << hi_borders.size() << endl;
 
         long n_nodes = layout[i];
 
@@ -1390,14 +1390,14 @@ double loss_est_complex(int h, long n_nodes, long next_n_nodes, long N_at_h0, do
     double loss = find_leaf_loss + avg_linear_loss;
 
     if (print) {// || (h == 0 && n_nodes == 6060606)) {
-        cout << "----------------" << endl
-             << "h = " << h << ", n_nodes = " << n_nodes << ", next_n_nodes = " << next_n_nodes
-             << ", s = " << s << ", rh = " << rh << ", n_stages = " << _n_stages << endl
-             << ", rmse_curr_h = " << rmse_current_height << ", rmse_next = " << next_level_rmse << endl
-             << ", loss_curr_h_lin = " << loss_curr_h_lin << ", loss_curr_h_bin = " << loss_curr_h_bin << endl
-             << ", loss_next_lin = " << loss_next_lin << ", loss_next_bin = " << loss_nex_bin << endl
-             << ", avg_linear_loss = " << avg_linear_loss << ", find_leaf_loss = " << find_leaf_loss << ", total_loss = " << loss << endl
-             << "----------------" << endl;
+        // cout << "----------------" << endl
+            //  << "h = " << h << ", n_nodes = " << n_nodes << ", next_n_nodes = " << next_n_nodes
+            //  << ", s = " << s << ", rh = " << rh << ", n_stages = " << _n_stages << endl
+            //  << ", rmse_curr_h = " << rmse_current_height << ", rmse_next = " << next_level_rmse << endl
+            //  << ", loss_curr_h_lin = " << loss_curr_h_lin << ", loss_curr_h_bin = " << loss_curr_h_bin << endl
+            //  << ", loss_next_lin = " << loss_next_lin << ", loss_next_bin = " << loss_nex_bin << endl
+            //  << ", avg_linear_loss = " << avg_linear_loss << ", find_leaf_loss = " << find_leaf_loss << ", total_loss = " << loss << endl
+            //  << "----------------" << endl;
     }
 
     return loss;
@@ -1413,7 +1413,7 @@ double loss_est(int h, long n_nodes, long last_n_nodes, double _rho, double rmse
 //    }
 
     if (print) {
-        cout << "h = " << h << ", _n_stages = " << _n_stages << endl;
+        // cout << "h = " << h << ", _n_stages = " << _n_stages << endl;
     }
     int n_stages = static_cast<int>(_n_stages);
 
@@ -1464,14 +1464,14 @@ double loss_est(int h, long n_nodes, long last_n_nodes, double _rho, double rmse
     double loss = find_leaf_loss + avg_linear_loss;
 
     if (print) {// || (h == 0 && n_nodes == 6060606)) {
-        cout << "----------------" << endl
-             << "h = " << h << ", n_nodes = " << n_nodes << ", last_n_nodes = " << last_n_nodes
-             << ", s = " << s << ", rh = " << rh << ", n_stages = " << _n_stages << endl
-             << ", rmse_curr_h = " << rmse_current_height << ", rmse_next = " << next_level_rmse << endl
-             << ", loss_curr_h_lin = " << loss_curr_h_lin << ", loss_curr_h_bin = " << loss_curr_h_bin << endl
-             << ", loss_next_lin = " << loss_next_lin << ", loss_next_bin = " << loss_nex_bin << endl
-             << ", avg_linear_loss = " << avg_linear_loss << ", find_leaf_loss = " << find_leaf_loss << ", total_loss = " << loss << endl
-             << "----------------" << endl;
+        // cout << "----------------" << endl
+            //  << "h = " << h << ", n_nodes = " << n_nodes << ", last_n_nodes = " << last_n_nodes
+            //  << ", s = " << s << ", rh = " << rh << ", n_stages = " << _n_stages << endl
+            //  << ", rmse_curr_h = " << rmse_current_height << ", rmse_next = " << next_level_rmse << endl
+            //  << ", loss_curr_h_lin = " << loss_curr_h_lin << ", loss_curr_h_bin = " << loss_curr_h_bin << endl
+            //  << ", loss_next_lin = " << loss_next_lin << ", loss_next_bin = " << loss_nex_bin << endl
+            //  << ", avg_linear_loss = " << avg_linear_loss << ", find_leaf_loss = " << find_leaf_loss << ", total_loss = " << loss << endl
+            //  << "----------------" << endl;
     }
 
     return loss;
@@ -1499,7 +1499,7 @@ long estimate_ideal_layout_complex(int h, long N_last, doubleVec &rmses, long N_
     }
 
     int step = 1000 / tmp;
-//    cout << "start_idx = " << start_idx << ", end_idx = " << end_idx << ", step = " << step << endl;
+//    // cout << "start_idx = " << start_idx << ", end_idx = " << end_idx << ", step = " << step << endl;
 
 
     for (long i = start_idx; i <= end_idx; i += step) { //i: curr_n_nodes
@@ -1530,14 +1530,14 @@ long estimate_ideal_layout_complex(int h, long N_last, doubleVec &rmses, long N_
                     best_loss_i = loss;
 
 //                    if (rmses[i] > 60) {
-//                        cout << "+++++++++i = " << i << ", best_loss_i = " << best_loss_i << ", rmse = " << rmses[i] << ", best_next_n_nodes_i = " << best_next_n_nodes_i << endl;
+//                        // cout << "+++++++++i = " << i << ", best_loss_i = " << best_loss_i << ", rmse = " << rmses[i] << ", best_next_n_nodes_i = " << best_next_n_nodes_i << endl;
 //                    }
                 }
             }
             last_next_n_nodes = next_n_nodes;
         }
 //        if (i % step == 0) {
-//        cout << "**i = " << i << ", loss = " << best_loss_i << ", rmse = " << rmses[i] << ", best_next_n_nodes_i = " << best_next_n_nodes_i << endl;
+//        // cout << "**i = " << i << ", loss = " << best_loss_i << ", rmse = " << rmses[i] << ", best_next_n_nodes_i = " << best_next_n_nodes_i << endl;
 //        }
         if (best_loss_i < best_loss) {
             best_loss = best_loss_i;
@@ -1547,12 +1547,12 @@ long estimate_ideal_layout_complex(int h, long N_last, doubleVec &rmses, long N_
             loss_est_complex(h, i, best_next_n_nodes, N_at_h0, h0_rmses, _rho, rmses[i], true);
 //            }
 
-//            cout << "i = " << i << ", loss = " << best_loss << ", rmse = " << rmses[i] << ", best_next_n_nodes = " << best_next_n_nodes << endl;
-//            cout << "i = " << i << ", loss = " << best_loss_i << ", rmse = " << rmse << ", min_next = " << i / max_int_fan << ", max_next = " << i / min_int_fan << endl;
+//            // cout << "i = " << i << ", loss = " << best_loss << ", rmse = " << rmses[i] << ", best_next_n_nodes = " << best_next_n_nodes << endl;
+//            // cout << "i = " << i << ", loss = " << best_loss_i << ", rmse = " << rmse << ", min_next = " << i / max_int_fan << ", max_next = " << i / min_int_fan << endl;
         }
     }
 
-    cout << "best_n_nodes = " << best_n_nodes << ", best_loss = " << best_loss << endl;
+    // cout << "best_n_nodes = " << best_n_nodes << ", best_loss = " << best_loss << endl;
 
     start_idx = std::max<long>(start_idx, best_n_nodes - step);
     end_idx = std::min<long>(end_idx, best_n_nodes + step);
@@ -1585,7 +1585,7 @@ long estimate_ideal_layout_complex(int h, long N_last, doubleVec &rmses, long N_
             last_next_n_nodes = next_n_nodes;
         }
 //        if (i % 1000 == 0) {
-//            cout << "i = " << i << ", loss = " << best_loss_i << ", rmse = " << rmse << ", min_next = " << i / max_int_fan << ", max_next = " << i / min_int_fan << endl;
+//            // cout << "i = " << i << ", loss = " << best_loss_i << ", rmse = " << rmse << ", min_next = " << i / max_int_fan << ", max_next = " << i / min_int_fan << endl;
 //        }
         if (best_loss_i < best_loss) {
             best_loss = best_loss_i;
@@ -1632,7 +1632,7 @@ long estimate_ideal_layout_complex(int h, long N_last, doubleVec &rmses, long N_
 //            }
 //        }
 //        if (i % 1000 == 0) {
-//            cout << "i = " << i << ", loss = " << best_loss_i << endl;
+//            // cout << "i = " << i << ", loss = " << best_loss_i << endl;
 //        }
 //        if (best_loss_i < best_loss) {
 //            best_loss = best_loss_i;
@@ -1661,7 +1661,7 @@ long estimate_ideal_layout(int h, long N_last, doubleVec &rmses, long N_at_h0, d
         tmp *= 10;
     }
     int step = 1000 / tmp;
-//    cout << "start_idx = " << start_idx << ", end_idx = " << end_idx << ", step = " << step
+//    // cout << "start_idx = " << start_idx << ", end_idx = " << end_idx << ", step = " << step
 //         << ", N_last = " << N_last << ", rmses.size() = " << rmses.size() << ", min_leaf_fan = " << min_leaf_fan << endl;
 
     for (long i = start_idx; i <= end_idx; i += step) { //i: curr_n_nodes
@@ -1673,10 +1673,10 @@ long estimate_ideal_layout(int h, long N_last, doubleVec &rmses, long N_at_h0, d
         if (loss < best_loss) {
             best_loss = loss;
             best_n_nodes = i;
-//            cout << "best_n_nodes = " << best_n_nodes << ", best_loss = " << best_loss << endl;
+//            // cout << "best_n_nodes = " << best_n_nodes << ", best_loss = " << best_loss << endl;
         }
         if (i == 1990000 || i == 10000000) {
-            cout << "-----i = " << i << ", rmse = " << rmses[i] << ", loss = " << loss << ", h = " << h << endl;
+            // cout << "-----i = " << i << ", rmse = " << rmses[i] << ", loss = " << loss << ", h = " << h << endl;
         }
     }
 
@@ -1687,7 +1687,7 @@ long estimate_ideal_layout(int h, long N_last, doubleVec &rmses, long N_at_h0, d
         if (loss < best_loss) {
             best_loss = loss;
             best_n_nodes = i;
-//            cout << "best_n_nodes = " << best_n_nodes << ", best_loss = " << best_loss << endl;
+//            // cout << "best_n_nodes = " << best_n_nodes << ", best_loss = " << best_loss << endl;
         }
     }
     return best_n_nodes;
@@ -1699,7 +1699,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
     int dir_status = file_utils::path_status(mirror_dir);
 
     if (dir_status > 1) {
-        cout << mirror_dir << " exists and it is not a directory path." << endl;
+        // cout << mirror_dir << " exists and it is not a directory path." << endl;
         return;
     }
     else if (dir_status == 0) {
@@ -1720,7 +1720,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
         bool restore_status = restore_complete_borders_and_losses(mirror_dir, 0, h0_borders, h0_rmses);
         if (!restore_status) {
 //            get_complete_partition_borders(X, probs, N, 0, 32, fanThreashold/2, h0_borders, h0_rmses, interval_type);
-            cout << "Building BU-Tree...... This step may take several minutes but will be executed once only." << endl;
+            // cout << "Building BU-Tree...... This step may take several minutes but will be executed once only." << endl;
 
             auto start = chrono::system_clock::now();
             get_complete_partition_borders(X, probs, N, 0, buMinFan, fanThreashold/2, h0_borders, h0_rmses, interval_type);
@@ -1729,7 +1729,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
             auto stop = chrono::system_clock::now();
             auto duration = chrono::duration_cast<chrono::seconds>(stop - start);
             double response_time = static_cast<double>(duration.count());
-            cout << "get_complete_partition_borders takes " << response_time << " seconds." << endl;
+            // cout << "get_complete_partition_borders takes " << response_time << " seconds." << endl;
             string h0_borders_path = mirror_dir + "/h0_borders";
             data_utils::save_vec_data(h0_borders_path.c_str(), h0_borders);
 
@@ -1743,11 +1743,11 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
                 ++xcount;
             }
         }
-//        cout << "######, xcount = " << xcount << endl;
+//        // cout << "######, xcount = " << xcount << endl;
 
         long h0_min_size = h0_borders.back();
         h0_borders.pop_back();
-//        cout << "h0_borsers.size() = " << h0_borders.size() << ", h0_rmses.size = " << h0_rmses.size() << endl;
+//        // cout << "h0_borsers.size() = " << h0_borders.size() << ", h0_rmses.size = " << h0_rmses.size() << endl;
 
         long est_next_n_nodes = 0;
         double h0_loss = 0;
@@ -1756,14 +1756,14 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
         mirror.push_back(longVec());
         assert(h0_min_size < est_n_nodes);
 
-        cout << "h0, est_n_nodes = " << est_n_nodes << endl;
+        // cout << "h0, est_n_nodes = " << est_n_nodes << endl;
         mirror[0].insert(mirror[0].end(), h0_borders.begin(), h0_borders.begin() + est_n_nodes);
         sort(mirror[0].begin(), mirror[0].end());
 //        string h0_path = mirror_dir + "/h0.dat";
 //        data_utils::save_vec_data(h0_path.c_str(), mirror[0]);
     }
 
-//    cout << "BU leaf nodes have been created. #nodes = " << mirror[0].size() << endl;
+//    // cout << "BU leaf nodes have been created. #nodes = " << mirror[0].size() << endl;
 
     longVec root_info({X[0]});
     while (true){
@@ -1788,7 +1788,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
         double root_bin_loss = (root_rmse > 2) ? 2 * log(root_rmse) / log(2.0) : 2;
         double root_loss = std::min<double>(root_lin_loss, root_bin_loss);
         root_loss *= (1 + R2) * pow(RHO, curr_h);
-//        cout << "curr_h = " << curr_h << ", root_loss = " << root_loss << endl;
+//        // cout << "curr_h = " << curr_h << ", root_loss = " << root_loss << endl;
 
         longVec hi_borders;
         doubleVec hi_rmses;
@@ -1800,7 +1800,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
 
         long hi_min_size = hi_borders.back();
         hi_borders.pop_back();
-//        cout << "h" << curr_h << "_borsers.size() = " << hi_borders.size() << ", h" << curr_h << "_rmses.size = " << hi_rmses.size() << endl;
+//        // cout << "h" << curr_h << "_borsers.size() = " << hi_borders.size() << ", h" << curr_h << "_rmses.size = " << hi_rmses.size() << endl;
 
         long est_next_n_nodes = 0;
         double hi_loss = 0;
@@ -1815,7 +1815,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
             mirror.push_back(longVec());
 //            assert(hi_min_size < est_n_nodes);
 
-//            cout << "h" << curr_h <<", est_n_nodes = " << est_n_nodes << endl;
+//            // cout << "h" << curr_h <<", est_n_nodes = " << est_n_nodes << endl;
             mirror[curr_h].insert(mirror[curr_h].end(), hi_borders.begin(), hi_borders.begin() + est_n_nodes);
             sort(mirror[curr_h].begin(), mirror[curr_h].end());
         }
@@ -1833,7 +1833,7 @@ void restore_mirror(const string &mirror_dir, l_matrix &mirror, bool ideal) {
 
 
         int hi_status = file_utils::path_status(hi_path);
-//        cout << "hi_path = " << hi_path << ", status = " << hi_status << endl;
+//        // cout << "hi_path = " << hi_path << ", status = " << hi_status << endl;
         if (hi_status > 1) {
             mirror.push_back(longVec());
             data_utils::load_vec_data(hi_path.c_str(), mirror[h]);
@@ -1841,7 +1841,7 @@ void restore_mirror(const string &mirror_dir, l_matrix &mirror, bool ideal) {
 //            long *tmp_data = new long[lv.size()];
 //            std::copy(lv.begin(), lv.end(), tmp_data);
 //            check_order(tmp_data, lv.size());
-//            cout << "h = " << h << ", lv.size = " << lv.size() << endl;
+//            // cout << "h = " << h << ", lv.size = " << lv.size() << endl;
             ++h;
         } else {
             break;

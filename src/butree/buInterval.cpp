@@ -27,7 +27,7 @@ void buInterval::init_merge_info_w_sampling() {
 
 void buInterval::cal_merge_info(int h) {
     if(lbd >= ubd) {
-        cout << "lbd = " << lbd << ", ubd = " << ubd << endl;
+        // cout << "lbd = " << lbd << ", ubd = " << ubd << endl;
     }
     assert(lbd < ubd);
     assert(rSib != NULL);
@@ -51,7 +51,7 @@ void buInterval::cal_merge_info(int h) {
 
 void buInterval::cal_merge_info_w_sampling(int h) {
     if(lbd >= ubd) {
-        cout << "lbd = " << lbd << ", ubd = " << ubd << endl;
+        // cout << "lbd = " << lbd << ", ubd = " << ubd << endl;
     }
     assert(lbd < ubd);
     assert(rSib != NULL);
@@ -93,10 +93,10 @@ bool buInterval::merge_with_rSib(int h, bool if_merge_lr) {
         end_idx = rSib->end_idx;
         assert(end_idx == start_idx + fanout);
         linear_loss += (rSib->linear_loss + merge_metric);
-//        cout << "lr->delta_x = " << lr->get_delta_x() <<  ", merge_lr->delta_x = "  <<  merge_lr->get_delta_x() << endl;
+//        // cout << "lr->delta_x = " << lr->get_delta_x() <<  ", merge_lr->delta_x = "  <<  merge_lr->get_delta_x() << endl;
         lr->copy_from(merge_lr);
 
-//        cout << "lr->delta_x = " << lr->get_delta_x() <<  endl;
+//        // cout << "lr->delta_x = " << lr->get_delta_x() <<  endl;
 //    lr = merge_lr;
 //    merge_lr = NULL;
     }

@@ -72,7 +72,7 @@ public:
     void build_from_mirror(l_matrix &mirror, const keyArray &all_keys, const recordPtrArray &all_ptrs, long N) {
         size_t H = mirror.size();
 
-//        cout << "+++H = " << H << endl;
+//        // cout << "+++H = " << H << endl;
         intVec n_nodes_each_level;
         intVec n_nodes_each_level_mirror;
         for (longVec &lv : mirror) {
@@ -164,7 +164,7 @@ public:
             start_idx += _num_nonempty;
         }
         if (start_idx != N) {
-            cout << "error, start_idx = " << start_idx << ", N = " << N << endl;
+            // cout << "error, start_idx = " << start_idx << ", N = " << N << endl;
         }
         assert(start_idx == N);
 
@@ -215,7 +215,7 @@ public:
         for (int i = 0; i < n_keys; ++i) {
             recordPtr pred = search(keys[i]);
             if (pred != ptrs[i]) {
-                cout << "i = " << i << ", key = " << keys[i] << ", pred = " << pred << ", ptr = " << ptrs[i] << endl;
+                // cout << "i = " << i << ", key = " << keys[i] << ", pred = " << pred << ", ptr = " << ptrs[i] << endl;
             }
             assert(pred == ptrs[i]);
         }
@@ -247,7 +247,7 @@ public:
 
 
     inline long search(const keyType &key) const{
-//        std::cout << "******key = " << key << std::endl;
+//        std::// cout << "******key = " << key << std::endl;
 
         diliNode *node = root;
         while (true) {

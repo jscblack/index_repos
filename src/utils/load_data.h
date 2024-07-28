@@ -69,7 +69,7 @@ namespace load_data {
     }
 
     void allocate() {
-//        cout << "calling load_data::allocate()" << endl;
+//        // cout << "calling load_data::allocate()" << endl;
 
         query_keys = make_unique<keyType []>(n_query_keys);
         query_ptrs = make_unique<recordPtr []>(n_query_keys);
@@ -117,7 +117,7 @@ namespace load_data {
         first_half_sorted_indices = std::move(data_utils::array_int64);
 
         totalDataSize = data_utils::load_data_to_uptr(data_path.c_str(), data_utils::KEY_FLAG);
-//        std::cout << "totalDataSize = " << totalDataSize << std::endl;
+//        std::// cout << "totalDataSize = " << totalDataSize << std::endl;
         assert(data_utils::array_key);
         allKeys = std::move(data_utils::array_key);
         halfN = totalDataSize / 2;
@@ -197,7 +197,7 @@ namespace load_data {
 
         long maxIdx = n_quarters * halfN / 2;
 //        if (_n != maxIdx) {
-//            cout << "_n = " << _n << ", maxIdx = " << maxIdx << endl;
+//            // cout << "_n = " << _n << ", maxIdx = " << maxIdx << endl;
 //        }
 //        assert(_n == maxIdx);
 

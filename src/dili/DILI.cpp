@@ -48,7 +48,7 @@ namespace diliFunc {
         int last_idx = 0;
         int cursor = 0;
 
-//        cout << "****height = " << height << ", n_parents = " << n_parents << ", n_keys = " << n_keys << endl;
+//        // cout << "****height = " << height << ", n_parents = " << n_parents << ", n_keys = " << n_keys << endl;
 
         for (int i = 0; i < n_parents; ++i) {
             diliNode *parent = parents[i];
@@ -72,8 +72,8 @@ namespace diliFunc {
                 int n_keys_this_child = idx - last_idx;
 
                 if (last_idx > idx) {
-                    cout << "child_id = " << child_id << ", range_from = " << range_from << ", range_to = " << range_to
-                         << ", parent_range_to = " << parent_range_to << endl;
+                    // cout << "child_id = " << child_id << ", range_from = " << range_from << ", range_to = " << range_to
+                        //  << ", parent_range_to = " << parent_range_to << endl;
                 }
                 assert(idx >= last_idx);
 
@@ -112,7 +112,7 @@ void DILI::save(const string &path) {
     FILE *fp = NULL;
 
     if (NULL == (fp = fopen(path.c_str(), "wb"))) {
-        cout << path << " cannot be created." << endl;
+        // cout << path << " cannot be created." << endl;
         exit(1);
     }
 
@@ -125,7 +125,7 @@ void DILI::load(const string &path) {
     FILE *fp = NULL;
 
     if (NULL == (fp = fopen(path.c_str(), "rb"))) {
-        cout << path << " cannot be opened." << endl;
+        // cout << path << " cannot be opened." << endl;
         exit(1);
     }
     root = new diliNode(true);
@@ -139,13 +139,13 @@ void DILI::bulk_load(const keyArray &keys, const recordPtrArray &ptrs, long n_ke
     build_ideal_mirror(keys, nullptr, n_keys, mirror, mirror_dir, interval_type);
 //    build_mirror(keys, nullptr, n_keys, mirror, mirror_dir, interval_type);
 
-//    cout << "----mirror.layout:------" << endl;
+//    // cout << "----mirror.layout:------" << endl;
 //    for (size_t i = 0; i < mirror.size(); ++i) {
-//        cout << mirror[i].size() << " " << endl;
+//        // cout << mirror[i].size() << " " << endl;
 //    }
-//    cout << endl;
+//    // cout << endl;
 
-    cout << "Building " << name() << "......" << endl;
+    // cout << "Building " << name() << "......" << endl;
     build_from_mirror(mirror, keys, ptrs, n_keys);
 }
 

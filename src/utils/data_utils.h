@@ -41,7 +41,7 @@ namespace data_utils {
         FILE *fp = NULL;
 
         if (NULL == (fp = fopen(data_path, "rb"))) {
-            printf("%s cannot be opened.\n", data_path);
+            // printf("%s cannot be opened.\n", data_path);
             exit(1);
         }
 
@@ -76,7 +76,7 @@ namespace data_utils {
         FILE *fp = NULL;
 
         if (NULL == (fp = fopen(data_path, "wb"))) {
-            printf("%s cannot be created.\n", data_path);
+            // printf("%s cannot be created.\n", data_path);
             exit(1);
         }
 
@@ -102,7 +102,7 @@ namespace data_utils {
         FILE *fp = NULL;
 
         if (NULL == (fp = fopen(data_path, "wb"))) {
-            printf("%s cannot be created.\n", data_path);
+            // printf("%s cannot be created.\n", data_path);
             exit(1);
         }
 
@@ -120,7 +120,7 @@ namespace data_utils {
         FILE *fp = NULL;
 
         if (NULL == (fp = fopen(data_path, "rb"))) {
-            printf("%s cannot be opened.\n", data_path);
+            // printf("%s cannot be opened.\n", data_path);
             exit(1);
         }
 
@@ -156,7 +156,7 @@ namespace data_utils {
                 min_diff = diff;
             }
             if (min_diff <= 0) {
-                std::cout << "i = " << i << ", data[i] = " << data[i] << std::endl;
+                // std::cout << "i = " << i << ", data[i] = " << data[i] << std::endl;
                 return min_diff;
             }
         }
