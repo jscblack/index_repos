@@ -529,6 +529,8 @@ public:
                     delete []keys;
                 } else if (BITMAP_GET(node->none_bitmap, i) != 1) {
                     out_file << node->items[i].comp.data.key << "," << 1 << "," << depth << std::endl;
+                } else {
+                    out_file << 0 << "," << 0 << "," << depth << std::endl;
                 }
             }
             
